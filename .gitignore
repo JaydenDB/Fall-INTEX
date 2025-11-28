@@ -1,0 +1,5 @@
+.DS_STORE
+*.code-workspace
+*.zip
+.env
+node_modules/
