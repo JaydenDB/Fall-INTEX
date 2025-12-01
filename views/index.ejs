@@ -1,11 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Impact Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    INTEX Website
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="hero-tag">
+            <span>WELCOME</span><span>•</span><span>Ella Rises Impact Portal</span>
+          </div>
+          <h1 class="hero-title">
+            Measuring how girls
+            <span class="hero-highlight">rise, learn, and succeed</span>
+            through Ella Rises programs.
+          </h1>
+          <p class="hero-subtitle">
+            This portal tracks participants, events, surveys, milestones, and donations so the Ella Rises
+            team and donors can see the impact of every workshop and program.
+          </p>
+          <div class="hero-actions">
+            <% if (!user) { %>
+              <a class="btn btn-primary" href="/login">Log in to manage data</a>
+            <% } else { %>
+              <a class="btn btn-primary" href="/admin/dashboard">Go to admin dashboard</a>
+            <% } %>
+            <a class="btn btn-ghost" href="#donors">View current donors</a>
+          </div>
+          <div class="hero-meta">
+            <div>
+              <strong><%= stats.totalParticipants || '—' %></strong>
+              participants tracked
+            </div>
+            <div>
+              <strong><%= stats.totalEvents || '—' %></strong>
+              events recorded
+            </div>
+            <div>
+              <strong><%= stats.milestonesAchieved || '—' %></strong>
+              milestones achieved
+            </div>
+          </div>
+        </div>
+
+        <!-- cute hero card on the right -->
+        <div class="hero-card">
+          <div class="hero-card-content">
+            <span class="badge badge-soft">
+              <span class="dot"></span>
+              Key outcomes
+            </span>
+            <h2 class="hero-card-title">Tracking long-term success</h2>
+            <p class="hero-card-body">
+              This system combines surveys, milestones, and donation data so Ella Rises can report
+              on satisfaction, usefulness, recommendation scores, and STEAM outcomes.
+            </p>
+            <div class="hero-chip-row">
+              <span class="hero-chip">Participants & events</span>
+              <span class="hero-chip">Surveys & milestones</span>
+              <span class="hero-chip">Donations & KPIs</span>
+            </div>
+            <div class="hero-butterfly">🦋</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPCOMING EVENTS -->
+    <section class="section section--soft" id="events">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-kicker">Events</p>
+          <h2 class="section-title">Upcoming Ella Rises Experiences</h2>
+          <p class="section-subtitle">
+            Highlight a few key events from the database so donors and participants can see what’s happening next.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <% upcomingEvents.forEach(event => { %>
+            <article class="card">
+              <span class="badge badge-soft"><%= event.type %></span>
+              <h3 style="margin-top: 0.6rem;"><%= event.name %></h3>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.4rem 0;">
+                <%= event.dateDisplay %> · <%= event.location %>
+              </p>
+              <p style="font-size: 0.88rem; color: var(--text-muted);">
+                <%= event.description %>
+              </p>
+            </article>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <!-- MILESTONES HIGHLIGHT -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-kicker">Milestones</p>
+          <h2 class="section-title">Long-term success indicators</h2>
+          <p class="section-subtitle">
+            These are examples of milestones you’ll track: college enrollment, STEAM majors, internships,
+            and post-college STEAM jobs.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <% milestonesSummary.forEach(m => { %>
+            <div class="card">
+              <span class="badge badge-soft"><%= m.label %></span>
+              <h3 style="margin-top: 0.5rem;"><%= m.title %></h3>
+              <p style="font-size: 2rem; margin: 0.4rem 0;"><%= m.value %></p>
+              <p style="font-size: 0.88rem; color: var(--text-muted);">
+                <%= m.description %>
+              </p>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <!-- DONORS SECTION -->
+    <section class="section section--soft" id="donors">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-kicker">Donors</p>
+          <h2 class="section-title">Our current supporters</h2>
+          <p class="section-subtitle">
+            Show high-level donation impact here to keep donors excited and recognize key partners.
+          </p>
+        </div>
+
+        <div class="grid-2">
+          <!-- donor list -->
+          <div class="card">
+            <h3 style="margin-bottom: 0.6rem;">Featured donors</h3>
+            <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted);">
+              <% donors.forEach(d => { %>
+                <li style="margin-bottom: 0.4rem;">
+                  <strong><%= d.name %></strong> – <%= d.level %> supporter
+                </li>
+              <% }) %>
+            </ul>
+          </div>
+
+          <!-- donor CTA -->
+          <div class="card">
+            <span class="badge badge-accent">Become a donor</span>
+            <h3 style="margin: 0.6rem 0 0.3rem;">Help girls succeed in STEAM</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.9rem;">
+              Donations fund instruments, supplies, summit days, and mentoring that lead to measurable milestones.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+              <a href="/donations/new" class="btn btn-primary">Become a donor</a>
+              <a href="/dashboard/public" class="btn btn-ghost">See impact metrics</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
 </body>
 </html>

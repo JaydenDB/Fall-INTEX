@@ -1,0 +1,39 @@
+<header class="nav">
+  <div class="container">
+    <div class="nav-inner" id="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logo">ER</div>
+        <div>
+          <div class="nav-title-main">Ella Rises</div>
+          <div class="nav-title-sub">Empowering young women in STEAM</div>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <a href="/" class="nav-link <%= activePage === 'home' ? 'nav-link--active' : '' %>">Home</a>
+        <a href="/admin/dashboard" class="nav-link <%= activePage === 'dashboard' ? 'nav-link--active' : '' %>">
+          Admin
+        </a>
+      </nav>
+
+      <div class="nav-cta">
+        <% if (!user) { %>
+          <a href="/login" class="btn btn-ghost">Log in</a>
+        <% } else { %>
+          <span style="font-size: 0.8rem; color: var(--text-muted); margin-right: 0.5rem;">
+            Hi, <%= user.name %>
+          </span>
+          <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+        <% } %>
+        <button class="nav-menu-toggle" type="button" onclick="toggleNav()">☰</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  function toggleNav() {
+    const navInner = document.getElementById('nav-inner');
+    navInner.classList.toggle('nav-menu-open');
+  }
+</script>
