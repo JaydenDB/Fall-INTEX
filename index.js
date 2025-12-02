@@ -41,11 +41,12 @@ app.use(express.urlencoded({ extended: true }));
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "postgres",
-    password: process.env.DB_PASSWORD || "ChPost05$",
-    database: process.env.DB_NAME || "intex",
-    port: process.env.DB_PORT || 5432,
+    host: "intexdb.c70cum08kg8k.us-east-2.rds.amazonaws.com",
+    user: "postgres",
+    password: "intexpassword",
+    database: "intexdb",
+    port: 5432,
+    ssl: { rejectUnauthorized: false }
   },
 });
 
