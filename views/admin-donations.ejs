@@ -21,6 +21,29 @@
           </p>
         </div>
 
+        <div class="grid-2" style="margin-bottom:1rem;">
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.2rem;">Total recorded</p>
+            <div style="font-size:1.8rem; font-weight:700;">
+              $<%= donationSummary ? donationSummary.totalAmount.toFixed(2) : '0.00' %>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.3rem;">
+              Across <strong><%= donationSummary ? donationSummary.donationCount : 0 %></strong> donation records.
+            </p>
+          </div>
+
+          <div class="card">
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+              Use this page to:
+            </p>
+            <ul style="font-size:0.85rem; color:var(--text-muted); padding-left:1.4rem; margin-top:0.3rem;">
+              <li>See the most recent gifts and their amounts.</li>
+              <li>Export data from the database for donor reporting.</li>
+              <li>Cross-reference donor emails with participants for deeper impact stories.</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="card">
           <table style="width:100%; border-collapse: collapse; font-size:0.88rem;">
             <thead>
