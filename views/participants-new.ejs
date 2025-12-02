@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Add Participant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container" style="max-width:640px;">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Participants</p>
+          <h2 class="section-title">Add new participant</h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            Record a new participant in the Ella Rises system and assign their role.
+          </p>
+        </div>
+
+        <div class="card">
+          <% if (error) { %>
+            <div style="
+              background:#ffe5e8;
+              border-radius:12px;
+              padding:0.6rem 0.8rem;
+              font-size:0.82rem;
+              color:#8a102b;
+              margin-bottom:0.9rem;
+              border:1px solid #ffc3cd;
+            ">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <form method="POST" action="/participants/new" style="display:flex; flex-direction:column; gap:0.7rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">First name</label>
+                <input name="firstName" type="text" required
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Last name</label>
+                <input name="lastName" type="text" required
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem;">Email</label>
+              <input name="email" type="email" required
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+            </div>
+
+            <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">Date of birth</label>
+                <input name="dob" type="date"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Role</label>
+                <select name="role"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;">
+                  <option value="participant" selected>Participant</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">Phone</label>
+                <input name="phone" type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">City</label>
+                <input name="city" type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:0.6fr 0.8fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">State</label>
+                <input name="state" type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Zip</label>
+                <input name="zip" type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">School / Employer</label>
+                <input name="school" type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem;">Field of interest</label>
+              <input name="fieldOfInterest" type="text"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+            </div>
+
+            <div style="margin-top:0.7rem; display:flex; gap:0.7rem;">
+              <button type="submit" class="btn btn-primary">Save participant</button>
+              <a href="/participants" class="btn btn-ghost">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>

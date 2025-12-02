@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Admin Donations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Admin</p>
+          <h2 class="section-title">Donations overview</h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            Recent donations recorded through the Ella Rises portal. Use this for reporting and donor stewardship.
+          </p>
+        </div>
+
+        <div class="card">
+          <table style="width:100%; border-collapse: collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                <th style="padding:0.5rem;">Date</th>
+                <th style="padding:0.5rem;">Email</th>
+                <th style="padding:0.5rem;">Participant ID</th>
+                <th style="padding:0.5rem;">Amount (USD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (donations.length === 0) { %>
+                <tr>
+                  <td colspan="4" style="padding:0.8rem; color:var(--text-muted);">
+                    No donations found.
+                  </td>
+                </tr>
+              <% } %>
+              <% donations.forEach(d => { %>
+                <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                  <td style="padding:0.5rem;">
+                    <%= d.donationdate ? d.donationdate.toISOString().slice(0,10) : '—' %>
+                  </td>
+                  <td style="padding:0.5rem;"><%= d.participantemail || '—' %></td>
+                  <td style="padding:0.5rem;"><%= d.participantid || '—' %></td>
+                  <td style="padding:0.5rem;">
+                    $<%= d.donationamount ? d.donationamount.toFixed(2) : '0.00' %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>

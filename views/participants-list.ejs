@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Participants</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Participants</p>
+          <h2 class="section-title">All participants</h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            View the participants who have engaged with Ella Rises events.
+            Admins can add and manage participant records.
+          </p>
+        </div>
+
+        <% if (user && user.role === 'admin') { %>
+          <div style="margin-bottom: 1rem;">
+            <a href="/participants/new" class="btn btn-primary">+ Add participant</a>
+          </div>
+        <% } %>
+
+        <div class="card">
+          <table style="width:100%; border-collapse: collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                <th style="padding:0.5rem;">Name</th>
+                <th style="padding:0.5rem;">Email</th>
+                <th style="padding:0.5rem;">Role</th>
+                <th style="padding:0.5rem;">City</th>
+                <th style="padding:0.5rem;">State</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (participants.length === 0) { %>
+                <tr>
+                  <td colspan="5" style="padding:0.8rem; color:var(--text-muted);">
+                    No participants found.
+                  </td>
+                </tr>
+              <% } %>
+              <% participants.forEach(p => { %>
+                <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                  <td style="padding:0.5rem;">
+                    <strong><%= (p.participantfirstname || '') + ' ' + (p.participantlastname || '') %></strong>
+                  </td>
+                  <td style="padding:0.5rem;"><%= p.participantemail %></td>
+                  <td style="padding:0.5rem; text-transform:capitalize;"><%= p.participantrole || 'participant' %></td>
+                  <td style="padding:0.5rem;"><%= p.participantcity || '—' %></td>
+                  <td style="padding:0.5rem;"><%= p.participantstate || '—' %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>
