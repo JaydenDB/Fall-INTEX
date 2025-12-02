@@ -1,6 +1,7 @@
 <header class="nav">
   <div class="container">
     <div class="nav-inner" id="nav-inner">
+      <!-- Brand -->
       <div class="nav-brand">
         <div class="nav-logo">ER</div>
         <div>
@@ -9,23 +10,65 @@
         </div>
       </div>
 
+      <!-- Main nav links -->
       <nav class="nav-links">
-        <a href="/" class="nav-link <%= activePage === 'home' ? 'nav-link--active' : '' %>">Home</a>
-        <a href="/admin/dashboard" class="nav-link <%= activePage === 'dashboard' ? 'nav-link--active' : '' %>">
-          Admin
+        <a
+          href="/"
+          class="nav-link <%= activePage === 'home' ? 'nav-link--active' : '' %>"
+        >
+          Home
         </a>
+
+        <% if (user && user.role === 'admin') { %>
+          <a
+            href="/admin/dashboard"
+            class="nav-link <%= activePage === 'dashboard' ? 'nav-link--active' : '' %>"
+          >
+            Admin
+          </a>
+        <% } %>
+
+        <% if (user) { %>
+          <!-- Optional: show quick links when logged in -->
+          <a
+            href="/participants"
+            class="nav-link <%= activePage === 'participants' ? 'nav-link--active' : '' %>"
+          >
+            Participants
+          </a>
+          <a
+            href="/events"
+            class="nav-link <%= activePage === 'events' ? 'nav-link--active' : '' %>"
+          >
+            Events
+          </a>
+        <% } %>
       </nav>
 
+      <!-- Right side: login / user badge -->
       <div class="nav-cta">
         <% if (!user) { %>
           <a href="/login" class="btn btn-ghost">Log in</a>
         <% } else { %>
-          <span style="font-size: 0.8rem; color: var(--text-muted); margin-right: 0.5rem;">
-            Hi, <%= user.name %>
+          <span
+            style="
+              font-size: 0.8rem;
+              color: var(--text-muted);
+              margin-right: 0.5rem;
+            "
+          >
+            Hi, <%= user.name || user.email %>
           </span>
           <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
         <% } %>
-        <button class="nav-menu-toggle" type="button" onclick="toggleNav()">☰</button>
+
+        <button
+          class="nav-menu-toggle"
+          type="button"
+          onclick="toggleNav()"
+        >
+          ☰
+        </button>
       </div>
     </div>
   </div>

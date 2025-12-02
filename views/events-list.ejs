@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Events</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Events</p>
+          <h2 class="section-title">Event templates</h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            These represent recurring Ella Rises experiences like workshops, summits, and performances.
+          </p>
+        </div>
+
+        <div class="card">
+          <table style="width:100%; border-collapse: collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                <th style="padding:0.5rem;">Name</th>
+                <th style="padding:0.5rem;">Type</th>
+                <th style="padding:0.5rem;">Recurrence</th>
+                <th style="padding:0.5rem;">Default capacity</th>
+                <th style="padding:0.5rem;">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (eventTemplates.length === 0) { %>
+                <tr>
+                  <td colspan="5" style="padding:0.8rem; color:var(--text-muted);">
+                    No events found. Admins can insert templates via the database or admin tools.
+                  </td>
+                </tr>
+              <% } %>
+              <% eventTemplates.forEach(ev => { %>
+                <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                  <td style="padding:0.5rem;"><strong><%= ev.eventname %></strong></td>
+                  <td style="padding:0.5rem;"><%= ev.eventtype || '—' %></td>
+                  <td style="padding:0.5rem;"><%= ev.eventrecurrencepattern || '—' %></td>
+                  <td style="padding:0.5rem;"><%= ev.eventdefaultcapacity || '—' %></td>
+                  <td style="padding:0.5rem; color:var(--text-muted);">
+                    <%= ev.eventdescription || 'No description provided.' %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>

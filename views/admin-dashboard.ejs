@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ella Rises – Admin Dashboard</title>
+  <title>Ella Rises – Admin Dashboards</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
-  <!-- Later: <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 </head>
 <body>
   <div class="page">
@@ -16,72 +15,42 @@
       <div class="container">
         <div class="section-header">
           <p class="section-kicker">Admin</p>
-          <h2 class="section-title">Impact dashboard</h2>
+          <h2 class="section-title">Impact dashboards</h2>
           <p class="section-subtitle">
-            Overview of how participants are liking their experiences and the long-term STEAM outcomes.
+            Embedded dashboards from Python and Tableau help Ella Rises leaders see which events and experiences
+            lead to milestone achievements and STEAM outcomes.
           </p>
         </div>
 
-        <!-- KPI Cards -->
-        <div class="grid-3" style="margin-bottom: 2rem;">
-          <div class="card">
-            <span class="badge badge-soft">Surveys</span>
-            <h3 style="margin: 0.5rem 0;">Avg satisfaction</h3>
-            <p style="font-size: 2rem;"><%= kpis.avgSatisfaction %> / 5</p>
-          </div>
-          <div class="card">
-            <span class="badge badge-soft">Surveys</span>
-            <h3 style="margin: 0.5rem 0;">Avg usefulness</h3>
-            <p style="font-size: 2rem;"><%= kpis.avgUsefulness %> / 5</p>
-          </div>
-          <div class="card">
-            <span class="badge badge-soft">Surveys</span>
-            <h3 style="margin: 0.5rem 0;">Avg recommend</h3>
-            <p style="font-size: 2rem;"><%= kpis.avgRecommend %> / 5</p>
+        <div class="card" style="margin-bottom:1.5rem;">
+          <h3 style="margin-bottom:0.6rem;">Program impact dashboard</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">
+            Replace the iframe below with your Tableau Public embed code.
+            Include filters for event type and participant demographics to support decision-making.
+          </p>
+
+          <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:18px; border:1px solid rgba(235,216,255,0.9);">
+            <!-- Placeholder Tableau embed -->
+            <iframe
+              src="https://public.tableau.com/views/YourDashboardNameHere"
+              style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>
 
-        <div class="grid-2">
-          <!-- STEAM KPIs -->
-          <div class="card">
-            <span class="badge badge-soft">STEAM Outcomes</span>
-            <h3 style="margin: 0.5rem 0;">Post-secondary STEAM success</h3>
-            <p>STEAM major graduation rate: <strong><%= kpis.steamGradRate %></strong></p>
-            <p>STEAM job placement rate: <strong><%= kpis.steamJobRate %></strong></p>
-            <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 0.6rem;">
-              These metrics will be calculated from participant milestones table once the data is loaded.
-            </p>
-          </div>
-
-          <!-- Top events -->
-          <div class="card">
-            <span class="badge badge-soft">High-impact events</span>
-            <h3 style="margin: 0.5rem 0;">Top events by survey score</h3>
-            <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted);">
-              <% topEvents.forEach(ev => { %>
-                <li style="margin-bottom: 0.4rem;">
-                  <strong><%= ev.name %></strong> – <%= ev.score %>/5 (n=<%= ev.participants %>)
-                </li>
-              <% }) %>
-            </ul>
-          </div>
+        <div class="card">
+          <h3 style="margin-bottom:0.5rem;">How to talk about this in the presentation</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">
+            In your client demo, use this page to show how ER administrators can:
+          </p>
+          <ul style="font-size:0.85rem; color:var(--text-muted); padding-left:1.4rem; margin-top:0.4rem;">
+            <li>Filter by event type (workshop, summit, music, etc.).</li>
+            <li>Filter by participant demographics (age, school, city).</li>
+            <li>See STEAM post-secondary graduation rate and post-college job rate.</li>
+            <li>Identify which events are associated with higher milestone achievement.</li>
+          </ul>
         </div>
-
-        <!-- Future milestones / roadmap -->
-        <section class="section" style="padding-top: 2rem;">
-          <div class="section-header">
-            <p class="section-kicker">Roadmap</p>
-            <h2 class="section-title">Future milestones</h2>
-          </div>
-          <div class="card">
-            <ul style="list-style: disc; padding-left: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
-              <% futureMilestones.forEach(item => { %>
-                <li style="margin-bottom: 0.3rem;"><%= item %></li>
-              <% }) %>
-            </ul>
-          </div>
-        </section>
-
       </div>
     </section>
 
