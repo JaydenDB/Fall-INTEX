@@ -41,7 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: "intexdb.c70cum08kg8k.us-east-2.rds.amazonaws.com",
+    host: "intexdb.c70cumo8kg8k.us-east-2.rds.amazonaws.com",
     user: "postgres",
     password: "intexpassword",
     database: "intexdb",
