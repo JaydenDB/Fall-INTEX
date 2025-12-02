@@ -44,7 +44,7 @@ const knex = require("knex")({
     host: "intexdb.c70cumo8kg8k.us-east-2.rds.amazonaws.com",
     user: "postgres",
     password: "intexpassword",
-    database: "intexdb",
+    database: "postgres",
     port: 5432,
     ssl: { rejectUnauthorized: false }
   },
