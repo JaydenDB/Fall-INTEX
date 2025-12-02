@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Edit Participant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container" style="max-width:640px;">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Participants</p>
+          <h2 class="section-title">Edit participant</h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            Update participant details or change their profile photo. Only admins can edit accounts.
+          </p>
+        </div>
+
+        <div class="card">
+          <% if (error) { %>
+            <div style="
+              background:#ffe5e8;
+              border-radius:12px;
+              padding:0.6rem 0.8rem;
+              font-size:0.82rem;
+              color:#8a102b;
+              margin-bottom:0.9rem;
+              border:1px solid #ffc3cd;
+            ">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <form
+            method="POST"
+            action="/participants/<%= participant.participantid %>/edit"
+            enctype="multipart/form-data"
+            style="display:flex; flex-direction:column; gap:0.7rem;"
+          >
+            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.6rem;">
+              <div
+                style="
+                  width:56px;
+                  height:56px;
+                  border-radius:50%;
+                  background:rgba(235,216,255,0.7);
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  overflow:hidden;
+                  font-weight:600;
+                  color:#5b3f7a;
+                "
+              >
+                <% if (participant.participantphoto) { %>
+                  <img
+                    src="<%= participant.participantphoto %>"
+                    alt="Profile photo"
+                    style="width:100%; height:100%; object-fit:cover;"
+                  />
+                <% } else { %>
+                  <%= (participant.participantfirstname || '?')[0] %><%= (participant.participantlastname || '')[0] || '' %>
+                <% } %>
+              </div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">
+                <div><strong>Participant ID:</strong> <%= participant.participantid %></div>
+                <div><strong>Current role:</strong> <%= participant.participantrole || 'participant' %></div>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">First name</label>
+                <input
+                  name="firstName"
+                  type="text"
+                  required
+                  value="<%= participant.participantfirstname || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Last name</label>
+                <input
+                  name="lastName"
+                  type="text"
+                  required
+                  value="<%= participant.participantlastname || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem;">Email</label>
+              <input
+                name="email"
+                type="email"
+                required
+                value="<%= participant.participantemail || '' %>"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
+            </div>
+
+            <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">Date of birth</label>
+                <input
+                  name="dob"
+                  type="date"
+                  value="<%= participant.participantdob ? participant.participantdob.toISOString().slice(0,10) : '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Role</label>
+                <select
+                  name="role"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                >
+                  <option value="participant" <%= participant.participantrole !== 'admin' ? 'selected' : '' %>>Participant</option>
+                  <option value="admin" <%= participant.participantrole === 'admin' ? 'selected' : '' %>>Admin</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">Phone</label>
+                <input
+                  name="phone"
+                  type="text"
+                  value="<%= participant.participantphone || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">City</label>
+                <input
+                  name="city"
+                  type="text"
+                  value="<%= participant.participantcity || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:0.6fr 0.8fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">State</label>
+                <input
+                  name="state"
+                  type="text"
+                  value="<%= participant.participantstate || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Zip</label>
+                <input
+                  name="zip"
+                  type="text"
+                  value="<%= participant.participantzip || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">School / Employer</label>
+                <input
+                  name="school"
+                  type="text"
+                  value="<%= participant.participantschooloremployer || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem;">Field of interest</label>
+              <input
+                name="fieldOfInterest"
+                type="text"
+                value="<%= participant.participantfieldofinterest || '' %>"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
+            </div>
+
+            <div style="border-top:1px solid rgba(235,216,255,0.9); padding-top:0.7rem; margin-top:0.5rem;">
+              <label style="font-size:0.8rem; display:block; margin-bottom:0.3rem;">Profile photo</label>
+              <input
+                name="photo"
+                type="file"
+                accept="image/*"
+                style="width:100%; padding:0.3rem 0; font-size:0.85rem;"
+              />
+              <% if (participant.participantphoto) { %>
+                <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.3rem; margin-top:0.3rem;">
+                  <input type="checkbox" name="removePhoto" />
+                  Remove current photo
+                </label>
+              <% } %>
+            </div>
+
+            <div style="margin-top:0.7rem; display:flex; gap:0.7rem;">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+              <a href="/participants" class="btn btn-ghost">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>

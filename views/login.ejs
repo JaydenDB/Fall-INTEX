@@ -12,16 +12,17 @@
     <%- include('partials/header') %>
 
     <section class="section">
-      <div class="container" style="max-width: 480px;">
+      <div class="container" style="max-width: 520px;">
+        <!-- Page heading -->
         <div class="section-header">
           <p class="section-kicker">Account</p>
           <h2 class="section-title">Log in to Ella Rises Portal</h2>
           <p class="section-subtitle">
-            Admins can manage participants, events, surveys, milestones, and donations.
-            Participants can view their progress and upcoming events.
+            Use your email to access the portal. Admins see management tools; participants see their events and progress.
           </p>
         </div>
 
+        <!-- Login card -->
         <div class="card">
           <% if (error) { %>
             <div style="
@@ -37,14 +38,17 @@
             </div>
           <% } %>
 
-          <form method="POST" action="/login" style="display: flex; flex-direction: column; gap: 0.9rem;">
+          <form method="POST" action="/login" style="display:flex; flex-direction:column; gap:0.9rem;">
             <div>
-              <label for="email" style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">Email</label>
+              <label for="email" style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 required
+                placeholder="you@example.com"
                 style="
                   width: 100%;
                   padding: 0.55rem 0.7rem;
@@ -55,31 +59,34 @@
               />
             </div>
 
-            <div>
-              <label for="password" style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                style="
-                  width: 100%;
-                  padding: 0.55rem 0.7rem;
-                  border-radius: 10px;
-                  border: 1px solid var(--border-soft);
-                  font-size: 0.9rem;
-                "
-              />
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="margin-top:0.5rem; width:100%; justify-content:center;">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              style="margin-top:0.5rem; width:100%; justify-content:center;"
+            >
               Log in
             </button>
 
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.6rem;">
-              If you don’t have an account yet, please contact an Ella Rises administrator.
-            </p>
+            <div style="margin-top:0.8rem; font-size:0.8rem; color:var(--text-muted);">
+              <p style="margin-bottom:0.3rem;">
+                Don’t have an account yet? For this class project, participant accounts are usually created by an Ella Rises admin.
+              </p>
+              <p>
+                If you think you should have access, please contact an administrator or email
+                <a href="mailto:info@ellarises.org" style="text-decoration:underline;">info@ellarises.org</a>.
+              </p>
+            </div>
           </form>
+        </div>
+
+        <!-- Small hint card -->
+        <div class="card" style="margin-top:1.2rem; font-size:0.85rem; color:var(--text-muted);">
+          <strong>Tip for your presentation:</strong> Explain that:
+          <ul style="margin-top:0.3rem; padding-left:1.2rem;">
+            <li>Admins use their email to access dashboards and CRUD tools.</li>
+            <li>Participants log in with the same email they use to register for events.</li>
+            <li>Permissions come from the <code>ParticipantRole</code> column in the database.</li>
+          </ul>
         </div>
       </div>
     </section>

@@ -17,38 +17,135 @@
           <p class="section-kicker">Admin</p>
           <h2 class="section-title">Impact dashboards</h2>
           <p class="section-subtitle">
-            Embedded dashboards from Python and Tableau help Ella Rises leaders see which events and experiences
-            lead to milestone achievements and STEAM outcomes.
+            Live KPIs from surveys, milestones, and donations. Use this page to tell the
+            story of which experiences are leading to long-term STEAM outcomes.
           </p>
         </div>
 
-        <div class="card" style="margin-bottom:1.5rem;">
-          <h3 style="margin-bottom:0.6rem;">Program impact dashboard</h3>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">
-            Replace the iframe below with your Tableau Public embed code.
-            Include filters for event type and participant demographics to support decision-making.
-          </p>
+        <!-- KPI ROW -->
+        <div class="grid-3" style="margin-bottom:1.5rem;">
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Survey experience</p>
+            <% if (kpis) { %>
+              <div style="font-size:2rem; font-weight:700;">
+                <%= kpis.avgSatisfaction %> / 5
+              </div>
+              <p style="font-size:0.9rem; color:var(--text-muted); margin:0.3rem 0;">
+                Average satisfaction across <strong><%= kpis.totalSurveys %></strong> survey responses.
+              </p>
+              <div style="display:flex; gap:1rem; margin-top:0.6rem; font-size:0.85rem;">
+                <div>
+                  <div style="font-weight:600;"><%= kpis.avgUsefulness %> / 5</div>
+                  <div style="color:var(--text-muted);">Usefulness</div>
+                </div>
+                <div>
+                  <div style="font-weight:600;"><%= kpis.avgRecommend %> / 5</div>
+                  <div style="color:var(--text-muted);">Would recommend</div>
+                </div>
+              </div>
+            <% } else { %>
+              <p style="font-size:0.9rem; color:var(--text-muted);">
+                No survey data yet. Once surveys are loaded, this card will show averages.
+              </p>
+            <% } %>
+          </div>
 
-          <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:18px; border:1px solid rgba(235,216,255,0.9);">
-            <!-- Placeholder Tableau embed -->
-            <iframe
-              src="https://public.tableau.com/views/YourDashboardNameHere"
-              style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"
-              allowfullscreen>
-            </iframe>
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">STEAM outcomes</p>
+            <% if (kpis) { %>
+              <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.9rem;">
+                <div>
+                  <div style="font-size:1.4rem; font-weight:700;"><%= kpis.steamGradRate %></div>
+                  <div style="color:var(--text-muted);">
+                    Participants with STEAM degree milestones (BS/MS in engineering, data, art & design, etc.).
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:1.4rem; font-weight:700;"><%= kpis.steamJobRate %></div>
+                  <div style="color:var(--text-muted);">
+                    Participants with STEAM internships or job-like milestones.
+                  </div>
+                </div>
+              </div>
+            <% } else { %>
+              <p style="font-size:0.9rem; color:var(--text-muted);">
+                Milestones will populate these percentages automatically once loaded.
+              </p>
+            <% } %>
+          </div>
+
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Donor impact</p>
+            <% if (kpis) { %>
+              <div style="font-size:1.6rem; font-weight:700;">
+                $<%= kpis.totalDonations %>
+              </div>
+              <p style="font-size:0.9rem; color:var(--text-muted); margin:0.3rem 0;">
+                Total recorded donations from <strong><%= kpis.donorCount %></strong> unique donor emails.
+              </p>
+              <p style="font-size:0.8rem; color:var(--text-muted);">
+                Use this card when talking with potential funders to show scale of support to date.
+              </p>
+            <% } else { %>
+              <p style="font-size:0.9rem; color:var(--text-muted);">
+                No donations recorded yet. Once donations are made, this card will update in real time.
+              </p>
+            <% } %>
           </div>
         </div>
 
+        <!-- TOP EVENTS TABLE -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:0.6rem;">
+            <div>
+              <h3 style="margin:0 0 0.25rem;">Top events by overall score</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
+                Pulled from the Surveys table, grouped by Event Name.
+              </p>
+            </div>
+          </div>
+
+          <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                <th style="padding:0.45rem;">Event name</th>
+                <th style="padding:0.45rem;">Responses</th>
+                <th style="padding:0.45rem;">Avg overall</th>
+                <th style="padding:0.45rem;">Avg satisfaction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!topEvents || topEvents.length === 0) { %>
+                <tr>
+                  <td colspan="4" style="padding:0.8rem; color:var(--text-muted);">
+                    No survey data yet. Once surveys are recorded, this table will rank events automatically.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% topEvents.forEach(ev => { %>
+                  <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                    <td style="padding:0.45rem;"><strong><%= ev.name %></strong></td>
+                    <td style="padding:0.45rem;"><%= ev.responseCount %></td>
+                    <td style="padding:0.45rem;"><%= ev.avgOverall %> / 5</td>
+                    <td style="padding:0.45rem;"><%= ev.avgSatisfaction %> / 5</td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- HOW TO PRESENT IT -->
         <div class="card">
-          <h3 style="margin-bottom:0.5rem;">How to talk about this in the presentation</h3>
+          <h3 style="margin-bottom:0.5rem;">How to talk about this in the client presentation</h3>
           <p style="font-size:0.85rem; color:var(--text-muted);">
-            In your client demo, use this page to show how ER administrators can:
+            In your demo, show how Ella Rises leadership can:
           </p>
           <ul style="font-size:0.85rem; color:var(--text-muted); padding-left:1.4rem; margin-top:0.4rem;">
-            <li>Filter by event type (workshop, summit, music, etc.).</li>
-            <li>Filter by participant demographics (age, school, city).</li>
-            <li>See STEAM post-secondary graduation rate and post-college job rate.</li>
-            <li>Identify which events are associated with higher milestone achievement.</li>
+            <li>Quickly see whether participants are satisfied and likely to recommend events.</li>
+            <li>Track which experiences correlate with STEAM degree and job milestones over time.</li>
+            <li>Use donor totals to tell a clear story about how funding turns into outcomes.</li>
+            <li>Drill into survey data in Tableau (on the <strong>Admin &gt; Dashboards</strong> page) for deeper analysis.</li>
           </ul>
         </div>
       </div>

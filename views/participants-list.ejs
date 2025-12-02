@@ -17,45 +17,135 @@
           <p class="section-kicker">Participants</p>
           <h2 class="section-title">All participants</h2>
           <p class="section-subtitle" style="margin-left:0;">
-            View the participants who have engaged with Ella Rises events.
-            Admins can add and manage participant records.
+            View participants engaged with Ella Rises events.
+            Admins can add, edit, and manage participant records (including profile photos).
           </p>
         </div>
 
-        <% if (user && user.role === 'admin') { %>
-          <div style="margin-bottom: 1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; gap:1rem; flex-wrap:wrap;">
+          <% if (user && user.role === 'admin') { %>
             <a href="/participants/new" class="btn btn-primary">+ Add participant</a>
+          <% } %>
+
+          <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; margin-left:auto;">
+            <input
+              id="participant-search"
+              type="text"
+              placeholder="Search by name or email..."
+              value="<%= (filters && filters.search) || '' %>"
+              style="padding:0.4rem 0.6rem; border-radius:999px; border:1px solid var(--border-soft); font-size:0.85rem; min-width:200px;"
+            />
+
+            <select
+              id="role-filter"
+              name="role"
+              style="padding:0.35rem 0.6rem; border-radius:999px; border:1px solid var(--border-soft); font-size:0.85rem;"
+              onchange="window.location='?role=' + encodeURIComponent(this.value)"
+            >
+              <option value="all" <%= (!filters || filters.role === 'all') ? 'selected' : '' %>>All roles</option>
+              <option value="participant" <%= (filters && filters.role === 'participant') ? 'selected' : '' %>>Participants</option>
+              <option value="admin" <%= (filters && filters.role === 'admin') ? 'selected' : '' %>>Admins</option>
+            </select>
           </div>
-        <% } %>
+        </div>
 
         <div class="card">
           <table style="width:100%; border-collapse: collapse; font-size:0.88rem;">
             <thead>
               <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
-                <th style="padding:0.5rem;">Name</th>
+                <th style="padding:0.5rem;">Participant</th>
                 <th style="padding:0.5rem;">Email</th>
                 <th style="padding:0.5rem;">Role</th>
                 <th style="padding:0.5rem;">City</th>
                 <th style="padding:0.5rem;">State</th>
+                <% if (user && user.role === 'admin') { %>
+                  <th style="padding:0.5rem; text-align:right;">Actions</th>
+                <% } %>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="participants-table-body">
               <% if (participants.length === 0) { %>
                 <tr>
-                  <td colspan="5" style="padding:0.8rem; color:var(--text-muted);">
+                  <td colspan="<%= (user && user.role === 'admin') ? 6 : 5 %>" style="padding:0.8rem; color:var(--text-muted);">
                     No participants found.
                   </td>
                 </tr>
               <% } %>
-              <% participants.forEach(p => { %>
-                <tr style="border-top:1px solid rgba(245,235,255,0.9);">
-                  <td style="padding:0.5rem;">
-                    <strong><%= (p.participantfirstname || '') + ' ' + (p.participantlastname || '') %></strong>
+              <% participants.forEach(p => { 
+                   const fullName = (p.participantfirstname || '') + ' ' + (p.participantlastname || '');
+                   const initials = (p.participantfirstname ? p.participantfirstname[0] : '') + (p.participantlastname ? p.participantlastname[0] : '');
+              %>
+                <tr
+                  class="participant-row"
+                  data-name="<%= fullName.toLowerCase() %>"
+                  data-email="<%= (p.participantemail || '').toLowerCase() %>"
+                  style="border-top:1px solid rgba(245,235,255,0.9);"
+                >
+                  <td style="padding:0.5rem; display:flex; align-items:center; gap:0.6rem;">
+                    <div
+                      style="
+                        width:32px;
+                        height:32px;
+                        border-radius:50%;
+                        background:rgba(235,216,255,0.7);
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:0.75rem;
+                        font-weight:600;
+                        color:#5b3f7a;
+                        overflow:hidden;
+                      "
+                    >
+                      <% if (p.participantphoto) { %>
+                        <img
+                          src="<%= p.participantphoto %>"
+                          alt="<%= fullName %>"
+                          style="width:100%; height:100%; object-fit:cover;"
+                        />
+                      <% } else { %>
+                        <%= initials || '?' %>
+                      <% } %>
+                    </div>
+                    <div>
+                      <div style="font-weight:600;"><%= fullName.trim() || '(No name)' %></div>
+                      <% if (p.participantfieldofinterest) { %>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">
+                          <%= p.participantfieldofinterest %>
+                        </div>
+                      <% } %>
+                    </div>
                   </td>
                   <td style="padding:0.5rem;"><%= p.participantemail %></td>
                   <td style="padding:0.5rem; text-transform:capitalize;"><%= p.participantrole || 'participant' %></td>
                   <td style="padding:0.5rem;"><%= p.participantcity || '—' %></td>
                   <td style="padding:0.5rem;"><%= p.participantstate || '—' %></td>
+
+                  <% if (user && user.role === 'admin') { %>
+                    <td style="padding:0.5rem; text-align:right;">
+                      <a
+                        href="/participants/<%= p.participantid %>/edit"
+                        class="btn btn-ghost btn-sm"
+                        style="margin-right:0.4rem;"
+                      >
+                        Edit
+                      </a>
+                      <form
+                        method="POST"
+                        action="/participants/<%= p.participantid %>/delete"
+                        style="display:inline;"
+                        onsubmit="return confirm('Delete this participant? This cannot be undone.');"
+                      >
+                        <button
+                          type="submit"
+                          class="btn btn-ghost btn-sm"
+                          style="color:#b3261e;"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </td>
+                  <% } %>
                 </tr>
               <% }) %>
             </tbody>
@@ -66,5 +156,24 @@
 
     <%- include('partials/footer') %>
   </div>
+
+  <script>
+    // Instant search (client-side) by name or email
+    const searchInput = document.getElementById('participant-search');
+    const rows = Array.from(document.querySelectorAll('.participant-row'));
+
+    if (searchInput && rows.length > 0) {
+      searchInput.addEventListener('input', function () {
+        const term = this.value.trim().toLowerCase();
+
+        rows.forEach(row => {
+          const name = row.getAttribute('data-name') || '';
+          const email = row.getAttribute('data-email') || '';
+          const match = !term || name.includes(term) || email.includes(term);
+          row.style.display = match ? '' : 'none';
+        });
+      });
+    }
+  </script>
 </body>
 </html>

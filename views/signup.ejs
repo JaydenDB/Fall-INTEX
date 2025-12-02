@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Sign up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container" style="max-width: 520px;">
+        <div class="section-header">
+          <p class="section-kicker">Account</p>
+          <h2 class="section-title">Create your Ella Rises account</h2>
+          <p class="section-subtitle">
+            Participants can create an account to see their information and be linked to surveys and milestones.
+          </p>
+        </div>
+
+        <div class="card">
+          <% if (error) { %>
+            <div style="
+              background: #ffe5e8;
+              border-radius: 12px;
+              padding: 0.6rem 0.8rem;
+              font-size: 0.82rem;
+              color: #8a102b;
+              margin-bottom: 0.9rem;
+              border: 1px solid #ffc3cd;
+            ">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <form method="POST" action="/signup" enctype="multipart/form-data"
+                style="display: flex; flex-direction: column; gap: 0.9rem;">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">First name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 0.55rem 0.7rem;
+                    border-radius: 10px;
+                    border: 1px solid var(--border-soft);
+                    font-size: 0.9rem;
+                  "
+                />
+              </div>
+              <div>
+                <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">Last name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 0.55rem 0.7rem;
+                    border-radius: 10px;
+                    border: 1px solid var(--border-soft);
+                    font-size: 0.9rem;
+                  "
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">Email</label>
+              <input
+                type="email"
+                name="email"
+                required
+                style="
+                  width: 100%;
+                  padding: 0.55rem 0.7rem;
+                  border-radius: 10px;
+                  border: 1px solid var(--border-soft);
+                  font-size: 0.9rem;
+                "
+              />
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">Profile photo (optional)</label>
+              <input
+                type="file"
+                name="photo"
+                accept="image/*"
+                style="width:100%; padding:0.4rem 0; font-size:0.85rem;"
+              />
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">City</label>
+                <input
+                  type="text"
+                  name="city"
+                  style="
+                    width: 100%;
+                    padding: 0.55rem 0.7rem;
+                    border-radius: 10px;
+                    border: 1px solid var(--border-soft);
+                    font-size: 0.9rem;
+                  "
+                />
+              </div>
+              <div>
+                <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">State</label>
+                <input
+                  type="text"
+                  name="state"
+                  style="
+                    width: 100%;
+                    padding: 0.55rem 0.7rem;
+                    border-radius: 10px;
+                    border: 1px solid var(--border-soft);
+                    font-size: 0.9rem;
+                  "
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">School (optional)</label>
+              <input
+                type="text"
+                name="school"
+                style="
+                  width: 100%;
+                  padding: 0.55rem 0.7rem;
+                  border-radius: 10px;
+                  border: 1px solid var(--border-soft);
+                  font-size: 0.9rem;
+                "
+              />
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">Field of interest (optional)</label>
+              <input
+                type="text"
+                name="fieldOfInterest"
+                style="
+                  width: 100%;
+                  padding: 0.55rem 0.7rem;
+                  border-radius: 10px;
+                  border: 1px solid var(--border-soft);
+                  font-size: 0.9rem;
+                "
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:0.5rem; width:100%; justify-content:center;">
+              Create account
+            </button>
+
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.6rem;">
+              Already have an account? <a href="/login">Log in</a>.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>
