@@ -14,6 +14,7 @@
     <section class="section">
       <div class="container">
         <div class="section-header">
+                    <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
           <p class="section-kicker">Admin</p>
           <h2 class="section-title">Impact dashboards</h2>
           <p class="section-subtitle">
@@ -78,7 +79,7 @@
             <p class="section-kicker" style="margin-bottom:0.3rem;">Donor impact</p>
             <% if (kpis) { %>
               <div style="font-size:1.6rem; font-weight:700;">
-                $<%= kpis.totalDonations %>
+                $<%= Number(kpis.totalDonations).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
               </div>
               <p style="font-size:0.9rem; color:var(--text-muted); margin:0.3rem 0;">
                 Total recorded donations from <strong><%= kpis.donorCount %></strong> unique donor emails.

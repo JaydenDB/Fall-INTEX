@@ -1,23 +1,41 @@
-/* ========== ROOT THEME ========== */
+/* ========== ROOT THEME & BRAND ========== */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Montserrat:wght@400;600;700&display=swap');
 
 :root {
-  --primary: #9b3f80;
-  --primary-dark: #7b315f;
-  --accent: #f7b267;
-  --accent-soft: #ffe1bf;
+  /* Brand color palette (provided) */
+  --color-light-blue: #99B7C6;
+  --color-lavender: #978EC4;
+  --color-cream: #F9F5EA;
+  --color-soft-peach: #FFD8D1;
+  --color-pink: #F9AFB1;
+  --color-sage: #9AB59D;
+  --color-charcoal: #3A3F3B;
+  --color-coral-peach: #F4B092;
+  --color-deep-rose: #CE325B;
 
-  --bg-body: #fff7fb;
+  /* Semantic aliases used by the site */
+  --primary: var(--color-lavender);
+  --primary-dark: var(--color-deep-rose);
+  --accent: var(--color-coral-peach);
+  --accent-soft: var(--color-soft-peach);
+
+  --bg-body: var(--color-cream);
   --bg-section: #ffffff;
 
-  --text-main: #2a1b30;
-  --text-muted: #6f6276;
+  --text-main: var(--color-charcoal);
+  --text-muted: var(--color-sage);
 
-  --border-soft: #f2d4ff;
+  --border-soft: rgba(151, 142, 196, 0.12);
   --shadow-soft: 0 14px 35px rgba(0, 0, 0, 0.07);
 
   --radius-lg: 22px;
   --radius-pill: 999px;
   --max-width: 1120px;
+
+  /* Fonts */
+  --font-heading: 'DM Serif Display', serif;
+  --font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --font-accent: 'TT Milk Script', cursive;
 }
 
 /* ========== GLOBAL RESET ========== */
@@ -30,10 +48,10 @@
 
 body {
   min-height: 100vh;
-  font-family: "Quicksand", system-ui, -apple-system, BlinkMacSystemFont;
+  font-family: var(--font-body);
   color: var(--text-main);
   line-height: 1.6;
-  background: radial-gradient(circle at top left, #ffe6ff 0, #fff7fb 40%, #ffffff 100%);
+  background: radial-gradient(circle at top left, rgba(255, 250, 245, 1) 0, var(--bg-body) 40%, #ffffff 100%);
 }
 
 a {
@@ -69,7 +87,148 @@ img {
   background: radial-gradient(circle at top, #ffe8ff 0, #fff7fb 55%, #ffffff 100%);
 }
 
-/* Section headings */
+/* ========== CAROUSEL ========== */
+
+.carousel-section {
+  width: 100%;
+  background: linear-gradient(135deg, #ffe6ff 0%, #fff7fb 50%, #f0e6ff 100%);
+  padding: 2rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.carousel-container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.carousel-inner {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(151, 142, 196, 0.18);
+  background: #f5f5f5;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+
+/* Carousel indicators / dots */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(151, 142, 196, 0.18);
+  border: 2px solid rgba(151, 142, 196, 0.28);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+  transform: scale(1.25);
+}
+
+.carousel-dot:hover {
+  background: rgba(155, 63, 128, 0.4);
+  border-color: var(--primary);
+}
+
+/* ========== HERO WITH CAROUSEL BACKGROUND ========== */
+
+.hero-carousel {
+  position: relative;
+  padding: 3rem 0 2.5rem;
+}
+
+.hero-carousel-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-carousel-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.hero-carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.hero-carousel .container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-carousel .hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-carousel .hero-title,
+.hero-carousel .hero-subtitle,
+.hero-carousel .hero-tag,
+.hero-carousel .hero-actions,
+.hero-carousel .hero-meta {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-carousel .hero-tag {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.hero-carousel .btn-ghost {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+.hero-carousel .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hero-carousel .hero-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* ========== HERO ========== */
 
 .section-header {
   text-align: center;
@@ -86,7 +245,7 @@ img {
 }
 
 .section-title {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-heading);
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
@@ -123,7 +282,7 @@ img {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(155, 63, 128, 0.4);
+  box-shadow: 0 18px 40px rgba(151, 142, 196, 0.32);
 }
 
 .btn-ghost {
@@ -141,6 +300,27 @@ img {
   font-size: 0.8rem;
 }
 
+/* ========== ALERTS ========== */
+.alert-error {
+  background: var(--color-pink);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.82rem;
+  color: var(--color-deep-rose);
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(206, 50, 91, 0.12);
+}
+
+.alert-success {
+  background: rgba(154, 181, 157, 0.12); /* soft sage tint */
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.82rem;
+  color: var(--color-sage);
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(154, 181, 157, 0.2);
+}
+
 /* ========== TAGS / PILLS / BADGES ========== */
 
 .badge {
@@ -156,13 +336,13 @@ img {
 }
 
 .badge-soft {
-  background: rgba(155, 63, 128, 0.06);
+  background: rgba(151, 142, 196, 0.06);
   color: var(--primary-dark);
-  border: 1px solid rgba(155, 63, 128, 0.1);
+  border: 1px solid rgba(151, 142, 196, 0.1);
 }
 
 .badge-accent {
-  background: rgba(247, 178, 103, 0.16);
+  background: rgba(244, 176, 146, 0.14);
   color: var(--primary-dark);
 }
 
@@ -199,23 +379,14 @@ img {
   gap: 0.75rem;
 }
 
-.nav-logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 20%, #ffe6ff, #f7b267);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Playfair Display", serif;
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #fff;
-  box-shadow: var(--shadow-soft);
+.nav-logo-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
 }
 
 .nav-title-main {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-heading);
   font-size: 1.2rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -271,7 +442,7 @@ img {
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  border: 1px solid rgba(228, 200, 255, 0.9);
+  border: 1px solid rgba(151, 142, 196, 0.12);
   background: rgba(255, 255, 255, 0.96);
   font-size: 1.1rem;
   align-items: center;
@@ -307,7 +478,7 @@ img {
 }
 
 .hero-title {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-heading);
   font-size: clamp(2.2rem, 3vw + 1.3rem, 3.1rem);
   line-height: 1.1;
   margin-bottom: 0.9rem;
@@ -355,7 +526,7 @@ img {
   border-radius: var(--radius-lg);
   padding: 1.4rem 1.4rem 1rem;
   box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(242, 212, 255, 0.8);
+  border: 1px solid rgba(151, 142, 196, 0.12);
   position: relative;
   overflow: hidden;
 }
@@ -366,7 +537,7 @@ img {
   inset: 0;
   background:
     radial-gradient(circle at 10% 0, rgba(247, 178, 103, 0.26), transparent 60%),
-    radial-gradient(circle at 90% 100%, rgba(155, 63, 128, 0.22), transparent 60%);
+    radial-gradient(circle at 90% 100%, rgba(151, 142, 196, 0.22), transparent 60%);
   opacity: 1;
   pointer-events: none;
 }
@@ -377,7 +548,7 @@ img {
 }
 
 .hero-card-title {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-heading);
   font-size: 1.3rem;
   margin-bottom: 0.4rem;
 }
@@ -410,6 +581,16 @@ img {
   bottom: 0.4rem;
   font-size: 2.4rem;
   transform: rotate(-8deg);
+}
+
+.hero-card-logo {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 1rem;
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  opacity: 0.8;
 }
 
 /* ========== CARDS & GRIDS ========== */
@@ -476,11 +657,50 @@ img {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  border: 1px solid rgba(216, 192, 248, 0.9);
+  border: 1px solid rgba(151, 142, 196, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
+}
+
+.footer-logo-link {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 4px;
+}
+
+.footer-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ========== FEATURE IMAGES (non-carousel) ========== */
+.feature-gallery {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem 0;
+}
+.feature-gallery img {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(58,63,59,0.08);
+  border: 1px solid rgba(58,63,59,0.06);
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.feature-gallery img:first-child {
+  max-height: 450px;
+  grid-row: 1 / 4;
+}
+.feature-accent {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  margin-right: 0.6rem;
 }
 
 /* ========== RESPONSIVE ========== */

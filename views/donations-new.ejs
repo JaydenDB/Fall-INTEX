@@ -14,6 +14,8 @@
     <section class="section">
       <div class="container" style="max-width:640px;">
         <div class="section-header">
+          <img src="/images/feature/ella rises(1).png" alt="Accent" class="feature-accent">
+                    <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
           <p class="section-kicker">Donations</p>
           <h2 class="section-title">Support Ella Rises</h2>
           <p class="section-subtitle">
@@ -23,29 +25,13 @@
 
         <div class="card">
           <% if (error) { %>
-            <div style="
-              background:#ffe5e8;
-              border-radius:12px;
-              padding:0.6rem 0.8rem;
-              font-size:0.82rem;
-              color:#8a102b;
-              margin-bottom:0.9rem;
-              border:1px solid #ffc3cd;
-            ">
+            <div class="alert-error">
               <%= error %>
             </div>
           <% } %>
 
           <% if (success) { %>
-            <div style="
-              background:#e4ffe9;
-              border-radius:12px;
-              padding:0.6rem 0.8rem;
-              font-size:0.82rem;
-              color:#116634;
-              margin-bottom:0.9rem;
-              border:1px solid #b6f2c7;
-            ">
+            <div class="alert-success">
               <%= success %>
             </div>
           <% } %>

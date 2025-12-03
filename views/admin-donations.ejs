@@ -14,6 +14,7 @@
     <section class="section">
       <div class="container">
         <div class="section-header" style="text-align:left;">
+                    <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 70px; height: 70px; margin-bottom: 1rem;">
           <p class="section-kicker">Admin</p>
           <h2 class="section-title">Donations overview</h2>
           <p class="section-subtitle" style="margin-left:0;">
@@ -25,7 +26,7 @@
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.2rem;">Total recorded</p>
             <div style="font-size:1.8rem; font-weight:700;">
-              $<%= donationSummary ? donationSummary.totalAmount.toFixed(2) : '0.00' %>
+              $<%= donationSummary ? Number(donationSummary.totalAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00' %>
             </div>
             <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.3rem;">
               Across <strong><%= donationSummary ? donationSummary.donationCount : 0 %></strong> donation records.
@@ -70,7 +71,7 @@
                   <td style="padding:0.5rem;"><%= d.participantemail || '—' %></td>
                   <td style="padding:0.5rem;"><%= d.participantid || '—' %></td>
                   <td style="padding:0.5rem;">
-                    $<%= d.donationamount ? d.donationamount.toFixed(2) : '0.00' %>
+                    $<%= d.donationamount ? Number(d.donationamount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00' %>
                   </td>
                 </tr>
               <% }) %>

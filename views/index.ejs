@@ -11,8 +11,15 @@
   <div class="page">
     <%- include('partials/header') %>
 
-    <!-- HERO -->
-    <section class="hero">
+    <!-- HERO WITH CAROUSEL BACKGROUND -->
+    <section class="hero hero-carousel">
+      <!-- Background carousel images -->
+      <div class="hero-carousel-bg">
+        <img id="carouselBgImage1" class="hero-carousel-img" src="" alt="Background carousel">
+        <img id="carouselBgImage2" class="hero-carousel-img" src="" alt="Background carousel">
+        <div class="hero-carousel-overlay"></div>
+      </div>
+
       <div class="container hero-inner">
         <div>
           <div class="hero-tag">
@@ -68,13 +75,13 @@
               <span class="hero-chip">Surveys & milestones</span>
               <span class="hero-chip">Donations & KPIs</span>
             </div>
-            <div class="hero-butterfly">🦋</div>
+            <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" class="hero-card-logo">
           </div>
         </div>
       </div>
     </section>
 
-    <!-- UPCOMING EVENTS -->
+    <!-- UPCOMING EVENTS WITH SIDE IMAGE -->
     <section class="section section--soft" id="events">
       <div class="container">
         <div class="section-header">
@@ -85,19 +92,27 @@
           </p>
         </div>
 
-        <div class="grid-3">
-          <% upcomingEvents.forEach(event => { %>
-            <article class="card">
-              <span class="badge badge-soft"><%= event.type %></span>
-              <h3 style="margin-top: 0.6rem;"><%= event.name %></h3>
-              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.4rem 0;">
-                <%= event.dateDisplay %> · <%= event.location %>
-              </p>
-              <p style="font-size: 0.88rem; color: var(--text-muted);">
-                <%= event.description %>
-              </p>
-            </article>
-          <% }) %>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; align-items: start;">
+          <div>
+            <div class="grid-3">
+              <% upcomingEvents.forEach(event => { %>
+                <article class="card">
+                  <span class="badge badge-soft"><%= event.type %></span>
+                  <h3 style="margin-top: 0.6rem;"><%= event.name %></h3>
+                  <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.4rem 0;">
+                    <%= event.dateDisplay %> · <%= event.location %>
+                  </p>
+                  <p style="font-size: 0.88rem; color: var(--text-muted);">
+                    <%= event.description %>
+                  </p>
+                </article>
+              <% }) %>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center; padding-top: 1rem;">
+            <img src="/images/feature/825D53BB-2464-458F-8163-81095033AE6C.jpeg" alt="Ella Rises feature image" style="width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(58,63,59,0.08); border: 1px solid rgba(58,63,59,0.06);">
+          </div>
         </div>
       </div>
     </section>
@@ -171,5 +186,60 @@
 
     <%- include('partials/footer') %>
   </div>
+
+  <script>
+    // Rotating Image Carousel Background with seamless fade
+    let carouselImages = [];
+    let currentImageIndex = 0;
+    let displayDuration = 6000; // Show each image for 6 seconds
+    let transitionDuration = 1500; // 1.5 second fade transition
+
+    async function initializeCarousel() {
+      try {
+        const response = await fetch('/api/carousel-images');
+        const data = await response.json();
+        carouselImages = data.images || [];
+
+        if (carouselImages.length > 0) {
+          // Set initial images
+          document.getElementById('carouselBgImage1').src = carouselImages[0];
+          document.getElementById('carouselBgImage2').src = carouselImages[1] || carouselImages[0];
+          rotateImages();
+        }
+      } catch (err) {
+        console.error('Error loading carousel images:', err);
+      }
+    }
+
+    function rotateImages() {
+      setInterval(() => {
+        fadeToNextImage();
+      }, displayDuration + transitionDuration);
+    }
+
+    function fadeToNextImage() {
+      const img1 = document.getElementById('carouselBgImage1');
+      const img2 = document.getElementById('carouselBgImage2');
+      
+      // Determine which image is currently visible
+      const img1Visible = img1.style.opacity !== '0';
+      const activeImg = img1Visible ? img1 : img2;
+      const inactiveImg = img1Visible ? img2 : img1;
+      
+      // Move to next image
+      currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
+      
+      // Load next image into inactive element
+      inactiveImg.src = carouselImages[currentImageIndex];
+      inactiveImg.style.opacity = '0';
+      
+      // Fade out active, fade in inactive
+      activeImg.style.opacity = '0';
+      inactiveImg.style.opacity = '1';
+    }
+
+    // Initialize carousel when page loads
+    document.addEventListener('DOMContentLoaded', initializeCarousel);
+  </script>
 </body>
 </html>
