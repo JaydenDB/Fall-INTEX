@@ -15,11 +15,11 @@
       <div class="container" style="max-width: 520px;">
         <!-- Page heading -->
         <div class="section-header">
-                    <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
+          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
           <p class="section-kicker">Account</p>
           <h2 class="section-title">Log in to Ella Rises Portal</h2>
           <p class="section-subtitle">
-            Use your email to access the portal. Admins see management tools; participants see their events and progress.
+            Use your email and password to access the portal. Admins see management tools; participants see their own events and progress.
           </p>
         </div>
 
@@ -52,6 +52,25 @@
               />
             </div>
 
+            <div>
+              <label for="password" style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                style="
+                  width: 100%;
+                  padding: 0.55rem 0.7rem;
+                  border-radius: 10px;
+                  border: 1px solid var(--border-soft);
+                  font-size: 0.9rem;
+                "
+              />
+            </div>
+
             <button
               type="submit"
               class="btn btn-primary"
@@ -62,7 +81,7 @@
 
             <div style="margin-top:0.8rem; font-size:0.8rem; color:var(--text-muted);">
               <p style="margin-bottom:0.3rem;">
-                Don’t have an account yet? For this class project, participant accounts are usually created by an Ella Rises admin.
+                For this class project, accounts are usually created by an Ella Rises admin or via the signup form.
               </p>
               <p>
                 If you think you should have access, please contact an administrator or email
@@ -70,16 +89,6 @@
               </p>
             </div>
           </form>
-        </div>
-
-        <!-- Small hint card -->
-        <div class="card" style="margin-top:1.2rem; font-size:0.85rem; color:var(--text-muted);">
-          <strong>Tip for your presentation:</strong> Explain that:
-          <ul style="margin-top:0.3rem; padding-left:1.2rem;">
-            <li>Admins use their email to access dashboards and CRUD tools.</li>
-            <li>Participants log in with the same email they use to register for events.</li>
-            <li>Permissions come from the <code>ParticipantRole</code> column in the database.</li>
-          </ul>
         </div>
       </div>
     </section>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Participant Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Participant</p>
+          <h2 class="section-title">
+            <%= (participant.participantfirstname || '') + ' ' + (participant.participantlastname || '') %>
+          </h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            Admin view of an individual participant with donations, surveys, milestones, and registrations.
+          </p>
+        </div>
+
+        <a href="/participants" class="btn btn-ghost" style="margin-bottom:1rem;">← Back to participants</a>
+
+        <div class="grid-3" style="margin-bottom:1.5rem;">
+          <div class="card">
+            <div style="display:flex; gap:1rem;">
+              <div
+                style="
+                  width:64px;
+                  height:64px;
+                  border-radius:50%;
+                  background:rgba(235,216,255,0.8);
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  font-weight:700;
+                  color:#5b3f7a;
+                  overflow:hidden;
+                "
+              >
+                <% const initials = (participant.participantfirstname ? participant.participantfirstname[0] : '') + (participant.participantlastname ? participant.participantlastname[0] : ''); %>
+                <% if (participant.participantphoto) { %>
+                  <img src="<%= participant.participantphoto %>" alt="Photo" style="width:100%; height:100%; object-fit:cover;" />
+                <% } else { %>
+                  <%= initials || '?' %>
+                <% } %>
+              </div>
+              <div>
+                <h3 style="margin:0;"><%= (participant.participantfirstname || '') + ' ' + (participant.participantlastname || '') %></h3>
+                <p style="margin:0.2rem 0; font-size:0.9rem; color:var(--text-muted);">
+                  <%= participant.participantemail %>
+                </p>
+                <p style="margin:0.2rem 0; font-size:0.9rem;">
+                  Role: <strong><%= participant.participantrole || 'participant' %></strong>
+                </p>
+                <% if (participant.participantfieldofinterest) { %>
+                  <p style="margin:0.2rem 0; font-size:0.9rem;">
+                    Interest: <%= participant.participantfieldofinterest %>
+                  </p>
+                <% } %>
+              </div>
+            </div>
+            <hr style="margin:0.8rem 0; border:none; border-top:1px solid rgba(235,216,255,0.9);" />
+            <p style="font-size:0.85rem; margin:0.1rem 0;">
+              Phone: <strong><%= participant.participantphone || '—' %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.1rem 0;">
+              City/State: <strong><%= participant.participantcity || '—' %>, <%= participant.participantstate || '—' %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.1rem 0;">
+              School/Employer: <strong><%= participant.participantschooloremployer || '—' %></strong>
+            </p>
+            <a href="/participants/<%= participant.participantid %>/edit" class="btn btn-ghost" style="margin-top:0.6rem;">Edit profile</a>
+          </div>
+
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Donations</p>
+            <h3 style="margin-top:0;">
+              $<%= stats.donations.totalAmount.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 }) %>
+            </h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+              Across <strong><%= stats.donations.donationCount %></strong> gifts.
+            </p>
+            <div style="margin-top:0.6rem;">
+              <p style="font-size:0.8rem; margin:0.15rem 0;">
+                First donation: <strong><%= stats.donations.firstDonation ? stats.donations.firstDonation.toDateString() : '—' %></strong>
+              </p>
+              <p style="font-size:0.8rem; margin:0.15rem 0;">
+                Most recent: <strong><%= stats.donations.lastDonation ? stats.donations.lastDonation.toDateString() : '—' %></strong>
+              </p>
+            </div>
+            <% if (stats.donations.recent && stats.donations.recent.length > 0) { %>
+              <h4 style="margin-top:0.8rem; font-size:0.9rem;">Recent gifts</h4>
+              <ul style="font-size:0.8rem; padding-left:1.2rem;">
+                <% stats.donations.recent.forEach(d => { %>
+                  <li>
+                    <%= d.donationdate.toDateString() %> – $
+                    <%= Number(d.donationamount).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 }) %>
+                  </li>
+                <% }) %>
+              </ul>
+            <% } else { %>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.6rem;">
+                No donations recorded for this participant yet.
+              </p>
+            <% } %>
+          </div>
+
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Registrations & Surveys</p>
+            <h3 style="margin-top:0;">Event engagement</h3>
+            <p style="font-size:0.85rem; margin:0.1rem 0;">
+              Total registrations: <strong><%= stats.registrations.totalRegistrations %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.1rem 0;">
+              Attended: <strong><%= stats.registrations.totalAttended %></strong> (<%= stats.registrations.attendanceRate %> attendance rate)
+            </p>
+            <hr style="margin:0.6rem 0; border:none; border-top:1px solid rgba(235,216,255,0.9);" />
+            <p style="font-size:0.85rem; margin:0.1rem 0;">
+              Surveys completed: <strong><%= stats.surveys.totalSurveys %></strong>
+            </p>
+            <p style="font-size:0.8rem; margin:0.1rem 0;">
+              Avg satisfaction: <strong><%= stats.surveys.avgSatisfaction %></strong> / 5
+            </p>
+            <p style="font-size:0.8rem; margin:0.1rem 0;">
+              Avg usefulness: <strong><%= stats.surveys.avgUsefulness %></strong> / 5
+            </p>
+            <p style="font-size:0.8rem; margin:0.1rem 0;">
+              Avg recommend: <strong><%= stats.surveys.avgRecommend %></strong> / 5
+            </p>
+            <p style="font-size:0.8rem; margin:0.1rem 0;">
+              Avg overall: <strong><%= stats.surveys.avgOverall %></strong> / 5
+            </p>
+          </div>
+        </div>
+
+        <!-- Milestones -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <h3 style="margin-top:0;">Milestones</h3>
+          <% if (!stats.milestones || stats.milestones.length === 0) { %>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+              No milestones recorded yet.
+            </p>
+          <% } else { %>
+            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+              <thead>
+                <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                  <th style="padding:0.4rem;">Title</th>
+                  <th style="padding:0.4rem;">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% stats.milestones.forEach(m => { %>
+                  <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                    <td style="padding:0.4rem;"><%= m.milestonetitle %></td>
+                    <td style="padding:0.4rem;"><%= m.milestonedate ? m.milestonedate.toDateString() : '—' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+
+        <!-- Recent survey activity -->
+        <div class="card">
+          <h3 style="margin-top:0;">Recent survey activity</h3>
+          <% if (!stats.surveys.recent || stats.surveys.recent.length === 0) { %>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+              No surveys recorded yet for this participant.
+            </p>
+          <% } else { %>
+            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+              <thead>
+                <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                  <th style="padding:0.4rem;">Event</th>
+                  <th style="padding:0.4rem;">Event date</th>
+                  <th style="padding:0.4rem;">Submitted</th>
+                  <th style="padding:0.4rem;">Satisfaction</th>
+                  <th style="padding:0.4rem;">Overall</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% stats.surveys.recent.forEach(s => { %>
+                  <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                    <td style="padding:0.4rem;"><%= s.eventname %></td>
+                    <td style="padding:0.4rem;"><%= s.eventdatetimestart ? s.eventdatetimestart.toDateString() : '—' %></td>
+                    <td style="padding:0.4rem;"><%= s.surveysubmissiondate ? s.surveysubmissiondate.toDateString() : '—' %></td>
+                    <td style="padding:0.4rem;"><%= s.surveysatisfactionscore || '—' %></td>
+                    <td style="padding:0.4rem;"><%= s.surveyoverallscore || '—' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>
