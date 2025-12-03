@@ -34,14 +34,21 @@
             This portal tracks participants, events, surveys, milestones, and donations so the Ella Rises
             team and donors can see the impact of every workshop and program.
           </p>
+
           <div class="hero-actions">
             <% if (!user) { %>
+              <!-- Logged-out -->
               <a class="btn btn-primary" href="/login">Log in to manage data</a>
-            <% } else { %>
+            <% } else if (user.role === 'admin') { %>
+              <!-- Admin -->
               <a class="btn btn-primary" href="/admin/dashboard">Go to admin dashboard</a>
+            <% } else { %>
+              <!-- Normal participant -->
+              <a class="btn btn-primary" href="/me">Go to my portal</a>
             <% } %>
             <a class="btn btn-ghost" href="#donors">View current donors</a>
           </div>
+
           <div class="hero-meta">
             <div>
               <strong><%= stats.totalParticipants || '—' %></strong>
@@ -57,31 +64,11 @@
             </div>
           </div>
         </div>
-
-        <!-- cute hero card on the right -->
-        <div class="hero-card">
-          <div class="hero-card-content">
-            <span class="badge badge-soft">
-              <span class="dot"></span>
-              Key outcomes
-            </span>
-            <h2 class="hero-card-title">Tracking long-term success</h2>
-            <p class="hero-card-body">
-              This system combines surveys, milestones, and donation data so Ella Rises can report
-              on satisfaction, usefulness, recommendation scores, and STEAM outcomes.
-            </p>
-            <div class="hero-chip-row">
-              <span class="hero-chip">Participants & events</span>
-              <span class="hero-chip">Surveys & milestones</span>
-              <span class="hero-chip">Donations & KPIs</span>
-            </div>
-            <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" class="hero-card-logo">
-          </div>
-        </div>
+        <!-- Note: hero-card / picture block removed on purpose -->
       </div>
     </section>
 
-    <!-- UPCOMING EVENTS WITH SIDE IMAGE -->
+    <!-- UPCOMING EVENTS -->
     <section class="section section--soft" id="events">
       <div class="container">
         <div class="section-header">
@@ -92,32 +79,24 @@
           </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; align-items: start;">
-          <div>
-            <div class="grid-3">
-              <% upcomingEvents.forEach(event => { %>
-                <article class="card">
-                  <span class="badge badge-soft"><%= event.type %></span>
-                  <h3 style="margin-top: 0.6rem;"><%= event.name %></h3>
-                  <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.4rem 0;">
-                    <%= event.dateDisplay %> · <%= event.location %>
-                  </p>
-                  <p style="font-size: 0.88rem; color: var(--text-muted);">
-                    <%= event.description %>
-                  </p>
-                </article>
-              <% }) %>
-            </div>
-          </div>
-
-          <div style="display: flex; align-items: center; justify-content: center; padding-top: 1rem;">
-            <img src="/images/feature/825D53BB-2464-458F-8163-81095033AE6C.jpeg" alt="Ella Rises feature image" style="width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(58,63,59,0.08); border: 1px solid rgba(58,63,59,0.06);">
-          </div>
+        <div class="grid-3">
+          <% upcomingEvents.forEach(event => { %>
+            <article class="card">
+              <span class="badge badge-soft"><%= event.type %></span>
+              <h3 style="margin-top: 0.6rem;"><%= event.name %></h3>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.4rem 0;">
+                <%= event.dateDisplay %> · <%= event.location %>
+              </p>
+              <p style="font-size: 0.88rem; color: var(--text-muted);">
+                <%= event.description %>
+              </p>
+            </article>
+          <% }) %>
         </div>
       </div>
     </section>
 
-    <!-- MILESTONES HIGHLIGHT -->
+    <!-- MILESTONES -->
     <section class="section">
       <div class="container">
         <div class="section-header">
@@ -144,7 +123,7 @@
       </div>
     </section>
 
-    <!-- DONORS SECTION -->
+    <!-- DONORS -->
     <section class="section section--soft" id="donors">
       <div class="container">
         <div class="section-header">
@@ -156,7 +135,6 @@
         </div>
 
         <div class="grid-2">
-          <!-- donor list -->
           <div class="card">
             <h3 style="margin-bottom: 0.6rem;">Featured donors</h3>
             <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted);">
@@ -168,7 +146,6 @@
             </ul>
           </div>
 
-          <!-- donor CTA -->
           <div class="card">
             <span class="badge badge-accent">Become a donor</span>
             <h3 style="margin: 0.6rem 0 0.3rem;">Help girls succeed in STEAM</h3>
@@ -188,11 +165,10 @@
   </div>
 
   <script>
-    // Rotating Image Carousel Background with seamless fade
     let carouselImages = [];
     let currentImageIndex = 0;
-    let displayDuration = 6000; // Show each image for 6 seconds
-    let transitionDuration = 1500; // 1.5 second fade transition
+    let displayDuration = 6000;
+    let transitionDuration = 1500;
 
     async function initializeCarousel() {
       try {
@@ -201,7 +177,6 @@
         carouselImages = data.images || [];
 
         if (carouselImages.length > 0) {
-          // Set initial images
           document.getElementById('carouselBgImage1').src = carouselImages[0];
           document.getElementById('carouselBgImage2').src = carouselImages[1] || carouselImages[0];
           rotateImages();
@@ -220,25 +195,16 @@
     function fadeToNextImage() {
       const img1 = document.getElementById('carouselBgImage1');
       const img2 = document.getElementById('carouselBgImage2');
-      
-      // Determine which image is currently visible
       const img1Visible = img1.style.opacity !== '0';
       const activeImg = img1Visible ? img1 : img2;
       const inactiveImg = img1Visible ? img2 : img1;
-      
-      // Move to next image
       currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
-      
-      // Load next image into inactive element
       inactiveImg.src = carouselImages[currentImageIndex];
       inactiveImg.style.opacity = '0';
-      
-      // Fade out active, fade in inactive
       activeImg.style.opacity = '0';
       inactiveImg.style.opacity = '1';
     }
 
-    // Initialize carousel when page loads
     document.addEventListener('DOMContentLoaded', initializeCarousel);
   </script>
 </body>

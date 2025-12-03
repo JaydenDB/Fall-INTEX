@@ -14,7 +14,7 @@
     <section class="section">
       <div class="container">
         <div class="section-header">
-                    <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
+          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
           <p class="section-kicker">Admin</p>
           <h2 class="section-title">Impact dashboards</h2>
           <p class="section-subtitle">
@@ -136,23 +136,61 @@
           </table>
         </div>
 
-        <!-- HOW TO PRESENT IT -->
-        <div class="card">
-          <h3 style="margin-bottom:0.5rem;">How to talk about this in the client presentation</h3>
-          <p style="font-size:0.85rem; color:var(--text-muted);">
-            In your demo, show how Ella Rises leadership can:
+        <!-- TABLEAU IMPACT DASHBOARD EMBED -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <h3 style="margin-bottom:0.5rem;">Ella Rises Impact Dashboard (Tableau)</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">
+            Explore live survey, milestone, and donation data in this Tableau dashboard.
           </p>
-          <ul style="font-size:0.85rem; color:var(--text-muted); padding-left:1.4rem; margin-top:0.4rem;">
-            <li>Quickly see whether participants are satisfied and likely to recommend events.</li>
-            <li>Track which experiences correlate with STEAM degree and job milestones over time.</li>
-            <li>Use donor totals to tell a clear story about how funding turns into outcomes.</li>
-            <li>Drill into survey data in Tableau (on the <strong>Admin &gt; Dashboards</strong> page) for deeper analysis.</li>
-          </ul>
+
+          <div class="tableauPlaceholder" id="viz1764789115052" style="position: relative">
+            <noscript>
+              <a href="#">
+                <img alt="Ella Rises Impact Dashboard"
+                     src="https://public.tableau.com/static/images/K4/K4PQQQQ4X/1_rss.png"
+                     style="border: none" />
+              </a>
+            </noscript>
+            <object class="tableauViz" style="display:none;">
+              <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+              <param name="embed_code_version" value="3" />
+              <param name="path" value="shared&#47;K4PQQQQ4X" />
+              <param name="toolbar" value="yes" />
+              <param name="static_image" value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;K4&#47;K4PQQQQ4X&#47;1.png" />
+              <param name="animate_transition" value="yes" />
+              <param name="display_static_image" value="yes" />
+              <param name="display_spinner" value="yes" />
+              <param name="display_overlay" value="yes" />
+              <param name="display_count" value="yes" />
+              <param name="language" value="en-US" />
+            </object>
+          </div>
         </div>
       </div>
     </section>
 
     <%- include('partials/footer') %>
   </div>
+
+  <!-- Tableau embed script -->
+  <script type="text/javascript">
+    var divElement = document.getElementById('viz1764789115052');
+    if (divElement) {
+      var vizElement = divElement.getElementsByTagName('object')[0];
+      if (divElement.offsetWidth > 800) {
+        vizElement.style.width = '100%';
+        vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px';
+      } else if (divElement.offsetWidth > 500) {
+        vizElement.style.width = '100%';
+        vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px';
+      } else {
+        vizElement.style.width = '100%';
+        vizElement.style.height = '1127px';
+      }
+      var scriptElement = document.createElement('script');
+      scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+      vizElement.parentNode.insertBefore(scriptElement, vizElement);
+    }
+  </script>
 </body>
 </html>

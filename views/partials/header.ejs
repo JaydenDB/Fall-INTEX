@@ -1,82 +1,155 @@
-<header class="nav">
-  <div class="container">
-    <div class="nav-inner" id="nav-inner">
-      <!-- Brand -->
-      <div class="nav-brand">
-        <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" class="nav-logo-img">
-        <div>
-          <div class="nav-title-main">Ella Rises</div>
-          <div class="nav-title-sub">Empowering young women in STEAM</div>
-        </div>
-      </div>
+<header class="site-header">
+  <div class="container header-inner" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.75rem 0;">
+    <!-- Left: Logo / brand -->
+    <a href="/" class="brand" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
+      <img
+        src="/images/ella%20rises%20logo.png"
+        alt="Ella Rises Logo"
+        style="width: 48px; height: 48px; border-radius:12px; object-fit:cover;"
+      >
+      <span style="font-family: 'Playfair Display', serif; font-weight:700; font-size:1.1rem; color:var(--text-strong, #2b1b3f);">
+        Ella Rises Portal
+      </span>
+    </a>
 
-      <!-- Main nav links -->
-      <nav class="nav-links">
-        <a
-          href="/"
-          class="nav-link <%= activePage === 'home' ? 'nav-link--active' : '' %>"
-        >
-          Home
-        </a>
+    <!-- Middle: Main navigation -->
+    <nav class="main-nav" style="display:flex; align-items:center; gap:0.9rem; font-size:0.9rem;">
+      <a
+        href="/"
+        class="nav-link <%= activePage === 'home' ? 'is-active' : '' %>"
+        style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+      >
+        Home
+      </a>
 
-        <% if (user && user.role === 'admin') { %>
-          <a
-            href="/admin/dashboard"
-            class="nav-link <%= activePage === 'dashboard' ? 'nav-link--active' : '' %>"
-          >
-            Admin
-          </a>
-        <% } %>
-
-        <% if (user) { %>
-          <!-- Optional: show quick links when logged in -->
-          <a
-            href="/participants"
-            class="nav-link <%= activePage === 'participants' ? 'nav-link--active' : '' %>"
-          >
-            Participants
-          </a>
+      <% if (user) { %>
+        <% if (user.role === 'admin') { %>
+          <!-- ADMIN NAV (no My portal, no Donate, no Impact dashboards) -->
           <a
             href="/events"
-            class="nav-link <%= activePage === 'events' ? 'nav-link--active' : '' %>"
+            class="nav-link <%= activePage === 'events' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
           >
             Events
           </a>
-        <% } %>
-      </nav>
 
-      <!-- Right side: login / user badge -->
-      <div class="nav-cta">
-        <% if (!user) { %>
-          <a href="/login" class="btn btn-ghost">Log in</a>
-        <% } else { %>
-          <span
-            style="
-              font-size: 0.8rem;
-              color: var(--text-muted);
-              margin-right: 0.5rem;
-            "
+          <a
+            href="/admin/dashboard"
+            class="nav-link <%= activePage === 'dashboard' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
           >
-            Hi, <%= user.name || user.email %>
-          </span>
-          <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
-        <% } %>
+            Admin dashboard
+          </a>
 
-        <button
-          class="nav-menu-toggle"
-          type="button"
-          onclick="toggleNav()"
+          <a
+            href="/participants"
+            class="nav-link <%= activePage === 'participants' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+          >
+            Participants
+          </a>
+
+          <a
+            href="/admin/donations"
+            class="nav-link <%= activePage === 'admin-donations' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+          >
+            Donations
+          </a>
+        <% } else { %>
+          <!-- PARTICIPANT NAV -->
+          <a
+            href="/me"
+            class="nav-link <%= activePage === 'me' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+          >
+            My portal
+          </a>
+
+          <a
+            href="/events"
+            class="nav-link <%= activePage === 'events' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+          >
+            Events
+          </a>
+
+          <a
+            href="/donate"
+            class="nav-link <%= activePage === 'donate' ? 'is-active' : '' %>"
+            style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+          >
+            Donate
+          </a>
+        <% } %>
+      <% } else { %>
+        <!-- Public/anonymous user navigation -->
+        <a
+          href="/events"
+          class="nav-link <%= activePage === 'events' ? 'is-active' : '' %>"
+          style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
         >
-          ☰
-        </button>
-      </div>
+          Events
+        </a>
+
+        <a
+          href="/donate"
+          class="nav-link <%= activePage === 'donate' ? 'is-active' : '' %>"
+          style="text-decoration:none; color:var(--text-muted, #6b5a7d); padding:0.25rem 0.35rem; border-radius:999px;"
+        >
+          Donate
+        </a>
+      <% } %>
+    </nav>
+
+    <!-- Right: auth buttons / user pill -->
+    <div class="header-actions" style="display:flex; align-items:center; gap:0.6rem; font-size:0.85rem;">
+      <% if (user) { %>
+        <span
+          class="user-pill"
+          style="
+            padding:0.25rem 0.7rem;
+            border-radius:999px;
+            background:rgba(235,216,255,0.7);
+            color:#5b3f7a;
+            font-weight:600;
+            max-width:200px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          "
+        >
+          <%= user.name || user.email %> · <%= user.role === 'admin' ? 'Admin' : 'Participant' %>
+        </span>
+        <a
+          href="/logout"
+          class="btn btn-ghost btn-sm"
+          style="text-decoration:none; padding:0.35rem 0.8rem; border-radius:999px; border:1px solid rgba(91,63,122,0.2);"
+        >
+          Log out
+        </a>
+      <% } else { %>
+        <a
+          href="/login"
+          class="btn btn-ghost btn-sm"
+          style="text-decoration:none; padding:0.35rem 0.8rem; border-radius:999px; border:1px solid rgba(91,63,122,0.2);"
+        >
+          Log in
+        </a>
+        <a
+          href="/signup"
+          class="btn btn-primary btn-sm"
+          style="
+            text-decoration:none;
+            padding:0.35rem 0.9rem;
+            border-radius:999px;
+            background:linear-gradient(135deg, #7a4ba3, #e75480);
+            color:#fff;
+          "
+        >
+          Sign up
+        </a>
+      <% } %>
     </div>
   </div>
 </header>
-
-<script>
-  function toggleNav() {
-    const navInner = document.getElementById('nav-inner');
-    navInner.classList.toggle('nav-menu-open');
-  }
-</script>

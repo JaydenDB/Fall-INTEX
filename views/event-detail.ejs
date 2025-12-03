@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Event Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Event</p>
+          <h2 class="section-title"><%= eventTemplate.eventname %></h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            Admin view of an event template with registrations and survey KPIs across all its occurrences.
+          </p>
+        </div>
+
+        <a href="/events" class="btn btn-ghost" style="margin-bottom:1rem;">← Back to events</a>
+
+        <div class="grid-3" style="margin-bottom:1.5rem;">
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Overview</p>
+            <h3 style="margin-top:0;"><%= eventTemplate.eventname %></h3>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Type: <strong><%= eventTemplate.eventtype || '—' %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Default capacity: <strong><%= eventTemplate.eventdefaultcapacity || '—' %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Recurrence: <strong><%= eventTemplate.eventrecurrencepattern || '—' %></strong>
+            </p>
+            <% if (eventTemplate.eventdescription) { %>
+              <p style="font-size:0.85rem; margin-top:0.6rem;">
+                <%= eventTemplate.eventdescription %>
+              </p>
+            <% } %>
+            <a href="/events/<%= eventTemplate.eventtemplateid %>/edit" class="btn btn-ghost" style="margin-top:0.8rem;">Edit template</a>
+          </div>
+
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Registrations</p>
+            <h3 style="margin-top:0;">Engagement</h3>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Total registrations: <strong><%= stats.registrations.totalRegistrations %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Attended: <strong><%= stats.registrations.totalAttended %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Attendance rate: <strong><%= stats.registrations.attendanceRate %></strong>
+            </p>
+          </div>
+
+          <div class="card">
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Surveys</p>
+            <h3 style="margin-top:0;">Experience</h3>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Surveys completed: <strong><%= stats.surveys.totalSurveys %></strong>
+            </p>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Avg satisfaction: <strong><%= stats.surveys.avgSatisfaction %></strong> / 5
+            </p>
+            <p style="font-size:0.85rem; margin:0.2rem 0;">
+              Avg overall: <strong><%= stats.surveys.avgOverall %></strong> / 5
+            </p>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem;">
+              Use these numbers when talking about which program formats resonate most with participants.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0;">Recent occurrences</h3>
+          <% if (!stats.occurrences || stats.occurrences.length === 0) { %>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+              No scheduled occurrences found for this template yet.
+            </p>
+          <% } else { %>
+            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+              <thead>
+                <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
+                  <th style="padding:0.4rem;">Date & time</th>
+                  <th style="padding:0.4rem;">Location</th>
+                  <th style="padding:0.4rem;">Capacity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% stats.occurrences.forEach(o => { %>
+                  <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                    <td style="padding:0.4rem;">
+                      <% if (o.eventdatetimestart) { %>
+                        <%= o.eventdatetimestart.toLocaleString() %>
+                      <% } else { %>
+                        —
+                      <% } %>
+                    </td>
+                    <td style="padding:0.4rem;"><%= o.eventlocation || '—' %></td>
+                    <td style="padding:0.4rem;"><%= o.eventcapacity || '—' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>
