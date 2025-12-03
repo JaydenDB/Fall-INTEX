@@ -23,6 +23,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use("/images", express.static(uploadRoot));
+app.use("/images/rotate-images", express.static(path.join(__dirname, "public", "images", "rotate-images")));
 app.use(express.static("public"));
 
 // ----- SESSION -----
@@ -34,6 +35,15 @@ app.use(
   })
 );
 
+  const DONOR_LEVEL_PLATINUM = process.env.DONOR_LEVEL_PLATINUM
+    ? Number(process.env.DONOR_LEVEL_PLATINUM)
+    : 2000;
+  const DONOR_LEVEL_GOLD = process.env.DONOR_LEVEL_GOLD
+    ? Number(process.env.DONOR_LEVEL_GOLD)
+    : 1000;
+  const DONOR_LEVEL_SILVER = process.env.DONOR_LEVEL_SILVER
+    ? Number(process.env.DONOR_LEVEL_SILVER)
+    : 500;
 // ----- BODY PARSING -----
 app.use(express.urlencoded({ extended: true }));
 
@@ -86,6 +96,27 @@ function pct(part, whole) {
 }
 
 // ----- ROUTES -----
+
+// GET /api/carousel-images - returns list of images for the rotating carousel
+app.get("/api/carousel-images", (req, res) => {
+  const fs = require("fs");
+  const carouselDir = path.join(__dirname, "public", "images", "rotate-images");
+  
+  try {
+    const files = fs.readdirSync(carouselDir);
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const images = files
+      .filter((file) =>
+        imageExtensions.includes(path.extname(file).toLowerCase())
+      )
+      .map((file) => `/images/rotate-images/${file}`);
+    
+    res.json({ images });
+  } catch (err) {
+    console.error("Error reading carousel images:", err);
+    res.json({ images: [] });
+  }
+});
 
 // HOME / LANDING PAGE (public, fully dynamic)
 app.get("/", async (req, res) => {
@@ -231,9 +262,9 @@ app.get("/", async (req, res) => {
     const donors = donorsAgg.map((d) => {
       const total = Number(d.totalamount || 0);
       let level = "Supporter";
-      if (total >= 2000) level = "Platinum";
-      else if (total >= 1000) level = "Gold";
-      else if (total >= 500) level = "Silver";
+      if (total >= DONOR_LEVEL_PLATINUM) level = "Platinum";
+      else if (total >= DONOR_LEVEL_GOLD) level = "Gold";
+      else if (total >= DONOR_LEVEL_SILVER) level = "Silver";
 
       return {
         name: d.participantemail,
