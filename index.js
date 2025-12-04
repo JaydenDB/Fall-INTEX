@@ -387,11 +387,23 @@ app.get("/", async (req, res) => {
           "et.eventtype",
           "et.eventdescription"
         ),
-      knex("donations")
-        .select("participantemail")
-        .sum({ totalamount: "donationamount" })
-        .whereNotNull("participantemail")
-        .groupBy("participantemail")
+      // Donors with names if available
+      knex("donations as d")
+        .leftJoin("participants as p", "d.participantid", "p.participantid")
+        .select(
+          "d.participantemail as email",
+          "p.participantid",
+          "p.participantfirstname",
+          "p.participantlastname"
+        )
+        .sum({ totalamount: "d.donationamount" })
+        .whereNotNull("d.participantemail")
+        .groupBy(
+          "d.participantemail",
+          "p.participantid",
+          "p.participantfirstname",
+          "p.participantlastname"
+        )
         .orderBy("totalamount", "desc")
         .limit(5),
     ]);
@@ -455,8 +467,14 @@ app.get("/", async (req, res) => {
       else if (total >= DONOR_LEVEL_GOLD) level = "Gold";
       else if (total >= DONOR_LEVEL_SILVER) level = "Silver";
 
+      const displayName =
+        (d.participantfirstname || d.participantlastname)
+          ? `${d.participantfirstname || ""} ${d.participantlastname || ""}`.trim()
+          : d.email;
+
       return {
-        name: d.participantemail,
+        displayName,
+        email: d.email,
         level,
       };
     });
@@ -1235,15 +1253,18 @@ app.post("/donate", async (req, res) => {
 app.get("/admin/donations", requireAdmin, async (req, res) => {
   try {
     const [donations, donationSummary] = await Promise.all([
-      knex("donations")
+      knex("donations as d")
+        .leftJoin("participants as p", "d.participantid", "p.participantid")
         .select(
-          "donationid",
-          "participantemail",
-          "donationdate",
-          "donationamount",
-          "participantid"
+          "d.donationid",
+          "d.participantemail",
+          "d.donationdate",
+          "d.donationamount",
+          "d.participantid",
+          "p.participantfirstname",
+          "p.participantlastname"
         )
-        .orderBy("donationdate", "desc")
+        .orderBy("d.donationdate", "desc")
         .limit(200),
       knex("donations")
         .sum({ totalamount: "donationamount" })
