@@ -12,97 +12,155 @@
     <%- include('partials/header') %>
 
     <section class="section">
-      <div class="container">
+      <div class="container" style="max-width: 1000px;">
+        <%
+          function formatDate(d) {
+            if (!d) return 'Date unknown';
+            try {
+              return d.toDateString();
+            } catch (e) {
+              return String(d);
+            }
+          }
+
+          function formatDateTime(d) {
+            if (!d) return 'Date unknown';
+            try {
+              return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+            } catch (e) {
+              return String(d);
+            }
+          }
+        %>
+
+        <!-- HEADER -->
         <div class="section-header" style="text-align:left;">
           <p class="section-kicker">Event</p>
           <h2 class="section-title"><%= eventTemplate.eventname %></h2>
           <p class="section-subtitle" style="margin-left:0;">
-            Admin view of an event template with registrations and survey KPIs across all its occurrences.
+            Template-level view combining registrations and survey outcomes for this type of event.
           </p>
         </div>
 
-        <a href="/events" class="btn btn-ghost" style="margin-bottom:1rem;">← Back to events</a>
-
-        <div class="grid-3" style="margin-bottom:1.5rem;">
+        <!-- TOP SUMMARY -->
+        <div style="display:grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap:1.2rem; align-items:flex-start; margin-bottom:1.4rem;">
+          <!-- Left: Meta -->
           <div class="card">
-            <p class="section-kicker" style="margin-bottom:0.3rem;">Overview</p>
-            <h3 style="margin-top:0;"><%= eventTemplate.eventname %></h3>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Type: <strong><%= eventTemplate.eventtype || '—' %></strong>
+            <p class="section-kicker" style="margin-bottom:0.3rem;">Event template</p>
+            <h3 style="margin:0 0 0.3rem;"><%= eventTemplate.eventname %></h3>
+            <p style="font-size:0.86rem; color:var(--text-muted); margin:0.2rem 0;">
+              Type:
+              <strong><%= eventTemplate.eventtype || 'Not specified' %></strong>
             </p>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Default capacity: <strong><%= eventTemplate.eventdefaultcapacity || '—' %></strong>
-            </p>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Recurrence: <strong><%= eventTemplate.eventrecurrencepattern || '—' %></strong>
-            </p>
+            <% if (eventTemplate.eventrecurrencepattern) { %>
+              <p style="font-size:0.86rem; color:var(--text-muted); margin:0.2rem 0;">
+                Recurrence:
+                <strong><%= eventTemplate.eventrecurrencepattern %></strong>
+              </p>
+            <% } %>
+            <% if (eventTemplate.eventdefaultcapacity) { %>
+              <p style="font-size:0.86rem; color:var(--text-muted); margin:0.2rem 0;">
+                Default capacity:
+                <strong><%= eventTemplate.eventdefaultcapacity %></strong>
+              </p>
+            <% } %>
             <% if (eventTemplate.eventdescription) { %>
-              <p style="font-size:0.85rem; margin-top:0.6rem;">
+              <p style="font-size:0.86rem; color:var(--text-muted); margin-top:0.4rem;">
                 <%= eventTemplate.eventdescription %>
               </p>
             <% } %>
-            <a href="/events/<%= eventTemplate.eventtemplateid %>/edit" class="btn btn-ghost" style="margin-top:0.8rem;">Edit template</a>
+
+            <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <a href="/events/<%= eventTemplate.eventtemplateid %>/edit" class="btn btn-primary btn-sm">
+                Edit event
+              </a>
+              <form
+                method="POST"
+                action="/events/<%= eventTemplate.eventtemplateid %>/delete"
+                onsubmit="return confirm('Delete this event template? This cannot be undone.');"
+                style="display:inline;"
+              >
+                <button type="submit" class="btn btn-ghost btn-sm" style="color:#b3261e;">
+                  Delete
+                </button>
+              </form>
+            </div>
           </div>
 
-          <div class="card">
-            <p class="section-kicker" style="margin-bottom:0.3rem;">Registrations</p>
-            <h3 style="margin-top:0;">Engagement</h3>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Total registrations: <strong><%= stats.registrations.totalRegistrations %></strong>
-            </p>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Attended: <strong><%= stats.registrations.totalAttended %></strong>
-            </p>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Attendance rate: <strong><%= stats.registrations.attendanceRate %></strong>
-            </p>
-          </div>
+          <!-- Right: KPI cards -->
+          <div style="display:grid; grid-template-columns:1fr; gap:0.9rem;">
+            <div class="card">
+              <p class="section-kicker" style="margin-bottom:0.2rem;">Registrations & attendance</p>
+              <div style="font-size:1.4rem; font-weight:700;">
+                <%= stats.registrations.totalRegistrations || 0 %> registrations
+              </div>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin:0.2rem 0;">
+                Attended:
+                <strong><%= stats.registrations.totalAttended || 0 %></strong><br>
+                Attendance rate:
+                <strong><%= stats.registrations.attendanceRate %></strong>
+              </p>
+            </div>
 
-          <div class="card">
-            <p class="section-kicker" style="margin-bottom:0.3rem;">Surveys</p>
-            <h3 style="margin-top:0;">Experience</h3>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Surveys completed: <strong><%= stats.surveys.totalSurveys %></strong>
-            </p>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Avg satisfaction: <strong><%= stats.surveys.avgSatisfaction %></strong> / 5
-            </p>
-            <p style="font-size:0.85rem; margin:0.2rem 0;">
-              Avg overall: <strong><%= stats.surveys.avgOverall %></strong> / 5
-            </p>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem;">
-              Use these numbers when talking about which program formats resonate most with participants.
-            </p>
+            <div class="card">
+              <p class="section-kicker" style="margin-bottom:0.2rem;">Survey outcomes</p>
+              <div style="font-size:1.4rem; font-weight:700;">
+                <%= stats.surveys.avgOverall %> / 5 overall
+              </div>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin:0.2rem 0;">
+                From <strong><%= stats.surveys.totalSurveys || 0 %></strong> survey(s).
+              </p>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">
+                Satisfaction: <strong><%= stats.surveys.avgSatisfaction %></strong> / 5
+              </p>
+            </div>
           </div>
         </div>
 
+        <!-- OCCURRENCES TABLE -->
         <div class="card">
-          <h3 style="margin-top:0;">Recent occurrences</h3>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:0.5rem;">
+            <div>
+              <h3 style="margin:0 0 0.2rem;">Recent occurrences of this event</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
+                Pulled from the EventOccurrences table for this template.
+              </p>
+            </div>
+          </div>
+
           <% if (!stats.occurrences || stats.occurrences.length === 0) { %>
-            <p style="font-size:0.85rem; color:var(--text-muted);">
-              No scheduled occurrences found for this template yet.
+            <p style="font-size:0.85rem; color:var(--text-muted); margin:0.5rem 0 0;">
+              No occurrences have been scheduled yet for this event template.
             </p>
           <% } else { %>
-            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
               <thead>
                 <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
-                  <th style="padding:0.4rem;">Date & time</th>
-                  <th style="padding:0.4rem;">Location</th>
-                  <th style="padding:0.4rem;">Capacity</th>
+                  <th style="padding:0.45rem;">Date</th>
+                  <th style="padding:0.45rem;">Time</th>
+                  <th style="padding:0.45rem;">Location</th>
+                  <th style="padding:0.45rem;">Capacity</th>
                 </tr>
               </thead>
               <tbody>
                 <% stats.occurrences.forEach(o => { %>
                   <tr style="border-top:1px solid rgba(245,235,255,0.9);">
-                    <td style="padding:0.4rem;">
+                    <td style="padding:0.45rem;">
+                      <%= formatDate(o.eventdatetimestart) %>
+                    </td>
+                    <td style="padding:0.45rem;">
                       <% if (o.eventdatetimestart) { %>
-                        <%= o.eventdatetimestart.toLocaleString() %>
+                        <%= o.eventdatetimestart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) %>
                       <% } else { %>
                         —
                       <% } %>
                     </td>
-                    <td style="padding:0.4rem;"><%= o.eventlocation || '—' %></td>
-                    <td style="padding:0.4rem;"><%= o.eventcapacity || '—' %></td>
+                    <td style="padding:0.45rem;">
+                      <%= o.eventlocation || 'TBD' %>
+                    </td>
+                    <td style="padding:0.45rem;">
+                      <%= o.eventcapacity != null ? o.eventcapacity : (eventTemplate.eventdefaultcapacity || '—') %>
+                    </td>
                   </tr>
                 <% }) %>
               </tbody>
