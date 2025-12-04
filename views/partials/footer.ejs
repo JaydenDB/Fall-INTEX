@@ -1,14 +1,44 @@
 <footer class="footer">
   <div class="container footer-inner">
-    <div>© <%= new Date().getFullYear() %> Ella Rises</div>
+    <!-- Left: tiny grey-ish teapot + year -->
+    <div class="footer-copy" style="display:flex; align-items:center; gap:0.25rem;">
+      <button
+        type="button"
+        onclick="window.location.href='/teapot';"
+        aria-label="Teapot error"
+        style="
+          border:none;
+          background:none;
+          cursor:pointer;
+          padding:0;
+          font-size:0.6rem;        /* smaller */
+          line-height:1;
+          filter: grayscale(1);    /* make it grey-ish */
+          opacity:0.55;            /* faded like a © */
+          vertical-align:middle;
+        "
+      >
+        🫖
+      </button>
 
-    <div class="footer-links">
-      <a href="/">Home</a>
-      <a href="/admin/dashboard">Admin</a>
+      <span style="color:#666; font-size:0.8rem;">
+        <%= new Date().getFullYear() %> Ella Rises
+      </span>
     </div>
 
+    <!-- Middle: footer links -->
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <% if (user && user.role === 'admin') { %>
+        <a href="/admin/dashboard">Admin</a>
+      <% } %>
+    </div>
+
+    <!-- Right: logo + email -->
     <div class="footer-social">
-      <a href="https://www.ellarises.org/" target="_blank" rel="noopener" class="footer-logo-link"><img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" class="footer-logo-img"></a>
+      <a href="https://www.ellarises.org/" target="_blank" rel="noopener" class="footer-logo-link">
+        <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" class="footer-logo-img">
+      </a>
       <a href="mailto:info@ellarises.org">✉</a>
     </div>
   </div>
