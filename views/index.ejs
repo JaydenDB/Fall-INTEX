@@ -37,15 +37,15 @@
           <div class="hero-actions">
             <% if (!user) { %>
               <!-- Logged-out -->
-              <a class="btn btn-primary" href="/login">Log in to manage data</a>
+              <a class="btn btn-primary" href="/login">Log In to Manage Data</a>
             <% } else if (user.role === 'admin') { %>
               <!-- Admin -->
-              <a class="btn btn-primary" href="/admin/dashboard">Go to admin dashboard</a>
+              <a class="btn btn-primary" href="/admin/dashboard">Go to Admin Dashboard</a>
             <% } else { %>
               <!-- Normal participant -->
-              <a class="btn btn-primary" href="/me">Go to my portal</a>
+              <a class="btn btn-primary" href="/me">Go to My Portal</a>
             <% } %>
-            <a class="btn btn-ghost" href="#donors">View current donors</a>
+            <a class="btn btn-ghost" href="#donors">View Current Donors</a>
           </div>
 
           <div class="hero-meta">
@@ -72,7 +72,11 @@
       <div class="container">
         <div class="section-header">
           <p class="section-kicker">Events</p>
-          <h2 class="section-title">Upcoming Ella Rises experiences</h2>
+
+          <h2 class="section-title">
+            <a href="/events">Upcoming Ella Rises Events</a>
+          </h2>
+
           <p class="section-subtitle">
             A glimpse at a few events coming up next.
           </p>
@@ -100,7 +104,7 @@
       <div class="container">
         <div class="section-header">
           <p class="section-kicker">Milestones</p>
-          <h2 class="section-title">Long-term success indicators</h2>
+          <h2 class="section-title">Long-Term Success Indicators</h2>
           <p class="section-subtitle">
             We celebrate progress in education, STEAM pathways, and early career opportunities.
           </p>
@@ -126,7 +130,7 @@
       <div class="container">
         <div class="section-header">
           <p class="section-kicker">Donors</p>
-          <h2 class="section-title">Our current supporters</h2>
+          <h2 class="section-title">Our Current Supporters</h2>
           <p class="section-subtitle">
             Recognizing some of the people whose generosity makes Ella Rises possible.
           </p>
@@ -135,7 +139,7 @@
         <div class="grid-2">
           <!-- Featured donors -->
           <div class="card">
-            <h3 style="margin-bottom: 0.6rem;">Featured donors</h3>
+            <h3 style="margin-bottom: 0.6rem;">Featured Donors</h3>
             <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted);">
               <% donors.forEach(d => { 
                    const donorLabel = d.displayName || d.name || d.email || '';
@@ -149,15 +153,17 @@
 
           <!-- Donor CTA -->
           <div class="card">
-            <span class="badge badge-accent">Become a donor</span>
+            <span class="badge badge-accent">Become a Donor</span>
             <h3 style="margin: 0.6rem 0 0.3rem;">Help girls succeed in STEAM</h3>
             <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.9rem;">
               Donations fund instruments, supplies, summit days, and mentoring that lead to measurable milestones.
             </p>
             <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
-              <a href="/donations/new" class="btn btn-primary">Become a donor</a>
-              <a href="/dashboard/public" class="btn btn-ghost">See impact metrics</a>
-            </div>
+              <a href="/donations/new" class="btn btn-primary">Become a Donor</a>
+              <% if (user && user.role === 'admin') { %>
+                <a href="/dashboard/public" class="btn btn-ghost">See Impact Metrics</a>
+              <% } %>
+            </div>            
           </div>
         </div>
       </div>
