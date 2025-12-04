@@ -36,25 +36,41 @@
             method="POST"
             action="<%= isSelfSignup ? '/signup' : '/participants/new' %>"
             enctype="multipart/form-data"
+            autocomplete="<%= isSelfSignup ? 'on' : 'off' %>"
             style="display:flex; flex-direction:column; gap:0.7rem;"
           >
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">First name</label>
-                <input name="firstName" type="text" required
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="firstName"
+                  type="text"
+                  required
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">Last name</label>
-                <input name="lastName" type="text" required
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="lastName"
+                  type="text"
+                  required
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
             </div>
 
             <div>
               <label style="font-size:0.8rem;">Email</label>
-              <input name="email" type="email" required
-                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              <input
+                name="email"
+                type="email"
+                required
+                <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
             </div>
 
             <!-- PASSWORD FIELD -->
@@ -64,6 +80,7 @@
                 name="password"
                 type="password"
                 <%= isSelfSignup ? 'required' : '' %>
+                <%= isSelfSignup ? '' : 'autocomplete="new-password"' %>
                 placeholder="<%= isSelfSignup ? 'Create a password for login' : 'Leave blank to keep no password' %>"
                 style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
               />
@@ -82,14 +99,20 @@
             <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Date of birth</label>
-                <input name="dob" type="date"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="dob"
+                  type="date"
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <% if (!isSelfSignup) { %>
                 <div>
                   <label style="font-size:0.8rem;">Role</label>
-                  <select name="role"
-                    style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;">
+                  <select
+                    name="role"
+                    style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                  >
                     <option value="participant" selected>Participant</option>
                     <option value="admin">Admin</option>
                   </select>
@@ -100,38 +123,62 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Phone</label>
-                <input name="phone" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="phone"
+                  type="text"
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">City</label>
-                <input name="city" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="city"
+                  type="text"
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
             </div>
 
             <div style="display:grid; grid-template-columns:0.6fr 0.8fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">State</label>
-                <input name="state" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="state"
+                  type="text"
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">Zip</label>
-                <input name="zip" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="zip"
+                  type="text"
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">School / Employer</label>
-                <input name="school" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="school"
+                  type="text"
+                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
             </div>
 
             <div>
               <label style="font-size:0.8rem;">Field of interest</label>
-              <input name="fieldOfInterest" type="text"
-                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              <input
+                name="fieldOfInterest"
+                type="text"
+                <%= isSelfSignup ? '' : 'autocomplete="off"' %>
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
             </div>
 
             <div>

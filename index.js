@@ -119,12 +119,18 @@ function pct(part, whole) {
 }
 
 /* --------------------------------------------------
-   ID HELPER (WORKAROUND BROKEN SEQUENCE)
+   ID HELPERS (WORKAROUND BROKEN SEQUENCES)
 -------------------------------------------------- */
 
 async function getNextParticipantId() {
-  const row = await knex("participants")
-    .max("participantid as maxId")
+  const row = await knex("participants").max("participantid as maxId").first();
+  const maxId = Number(row?.maxId || 0);
+  return maxId + 1;
+}
+
+async function getNextEventTemplateId() {
+  const row = await knex("eventtemplates")
+    .max("eventtemplateid as maxId")
     .first();
   const maxId = Number(row?.maxId || 0);
   return maxId + 1;
@@ -917,7 +923,7 @@ app.get("/participants", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: add participant
+// ADMIN: add participant (FORM)
 app.get("/participants/new", requireAdmin, (req, res) => {
   res.render("participants-new", {
     activePage: "participants",
@@ -927,6 +933,7 @@ app.get("/participants/new", requireAdmin, (req, res) => {
   });
 });
 
+// ADMIN: add participant (SUBMIT)  ✅ updated
 app.post(
   "/participants/new",
   requireAdmin,
@@ -950,8 +957,24 @@ app.post(
     const photoPath = req.file ? `/images/uploads/${req.file.filename}` : null;
 
     try {
+      // 1) Check for duplicate email (case-insensitive)
+      const existing = await knex("participants")
+        .whereRaw("LOWER(participantemail) = LOWER(?)", [email || ""])
+        .first();
+
+      if (existing) {
+        return res.render("participants-new", {
+          activePage: "participants",
+          user: req.session.user,
+          error: "A participant with that email already exists.",
+          isSelfSignup: false,
+        });
+      }
+
+      // 2) Generate next id
       const newId = await getNextParticipantId();
 
+      // 3) Insert
       await knex("participants").insert({
         participantid: newId,
         participantemail: email,
@@ -975,7 +998,7 @@ app.post(
       res.render("participants-new", {
         activePage: "participants",
         user: req.session.user,
-        error: "Error creating participant. Maybe email already exists?",
+        error: "Error creating participant.",
         isSelfSignup: false,
       });
     }
@@ -1120,7 +1143,7 @@ app.post("/participants/:id/delete", requireAdmin, async (req, res) => {
 });
 
 /* --------------------------------------------------
-   EVENTS (LIST + DETAIL + EDIT + DELETE)
+   EVENTS (LIST + CREATE + DETAIL + EDIT + DELETE)
 -------------------------------------------------- */
 
 // PUBLIC events list (no login required)
@@ -1145,6 +1168,82 @@ app.get("/events", async (req, res) => {
   } catch (err) {
     console.error("Error loading events:", err);
     res.status(500).send("Error loading events.");
+  }
+});
+
+// ADMIN: create event template (form)
+app.get("/events/new", requireAdmin, (req, res) => {
+  res.render("events-new", {
+    activePage: "events",
+    user: req.session.user,
+    error: null,
+    formData: {
+      eventName: "",
+      eventType: "",
+      eventDescription: "",
+      recurrencePattern: "",
+      defaultCapacity: "",
+    },
+  });
+});
+
+// ADMIN: create event template (submit)
+app.post("/events/new", requireAdmin, async (req, res) => {
+  const {
+    eventName,
+    eventType,
+    eventDescription,
+    recurrencePattern,
+    defaultCapacity,
+  } = req.body;
+
+  const trimmedName = (eventName || "").trim();
+
+  if (!trimmedName) {
+    return res.render("events-new", {
+      activePage: "events",
+      user: req.session.user,
+      error: "Event name is required.",
+      formData: {
+        eventName,
+        eventType,
+        eventDescription,
+        recurrencePattern,
+        defaultCapacity,
+      },
+    });
+  }
+
+  try {
+    const newId = await getNextEventTemplateId();
+
+    await knex("eventtemplates").insert({
+      eventtemplateid: newId,
+      eventname: trimmedName,
+      eventtype: eventType || null,
+      eventdescription: eventDescription || null,
+      eventrecurrencepattern: recurrencePattern || null,
+      eventdefaultcapacity:
+        defaultCapacity && defaultCapacity !== ""
+          ? Number(defaultCapacity)
+          : null,
+    });
+
+    res.redirect("/events");
+  } catch (err) {
+    console.error("Error creating event template:", err);
+    res.render("events-new", {
+      activePage: "events",
+      user: req.session.user,
+      error: "Error creating event template. Please try again.",
+      formData: {
+        eventName,
+        eventType,
+        eventDescription,
+        recurrencePattern,
+        defaultCapacity,
+      },
+    });
   }
 });
 

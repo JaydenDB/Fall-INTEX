@@ -13,7 +13,7 @@
 
     <section class="section">
       <div class="container" style="max-width: 1000px;">
-        <% 
+        <%
           // ---------- SAFE HELPERS FOR DATES ----------
           function formatDate(d) {
             if (!d) return 'Date unknown';
@@ -34,7 +34,7 @@
           }
 
           const fullName = ((participant.participantfirstname || '') + ' ' + (participant.participantlastname || '')).trim() || '(No name)';
-          const initials = 
+          const initials =
             (participant.participantfirstname ? participant.participantfirstname[0] : '') +
             (participant.participantlastname ? participant.participantlastname[0] : '');
         %>
