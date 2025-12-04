@@ -119,6 +119,18 @@ function pct(part, whole) {
 }
 
 /* --------------------------------------------------
+   ID HELPER (WORKAROUND BROKEN SEQUENCE)
+-------------------------------------------------- */
+
+async function getNextParticipantId() {
+  const row = await knex("participants")
+    .max("participantid as maxId")
+    .first();
+  const maxId = Number(row?.maxId || 0);
+  return maxId + 1;
+}
+
+/* --------------------------------------------------
    STATS HELPERS
 -------------------------------------------------- */
 
@@ -549,6 +561,7 @@ app.get("/login", (req, res) => {
   res.render("login", {
     activePage: "login",
     error: null,
+    formEmail: "",
   });
 });
 
@@ -568,12 +581,13 @@ app.post("/login", async (req, res) => {
       return res.render("login", {
         activePage: "login",
         error: "Invalid email or password.",
+        formEmail: suppliedEmail,
       });
     }
 
-    // Support either participantpassword or password column
+    // Prefer "password" column, but fall back to participantpassword if it ever exists
     const dbPasswordRaw =
-      participant.participantpassword ?? participant.password ?? "";
+      participant.password ?? participant.participantpassword ?? "";
 
     const dbPassword = (dbPasswordRaw || "").trim();
 
@@ -584,6 +598,7 @@ app.post("/login", async (req, res) => {
         return res.render("login", {
           activePage: "login",
           error: "Invalid email or password.",
+          formEmail: suppliedEmail,
         });
       }
     }
@@ -610,6 +625,7 @@ app.post("/login", async (req, res) => {
     return res.render("login", {
       activePage: "login",
       error: "An error occurred. Please try again.",
+      formEmail: suppliedEmail,
     });
   }
 });
@@ -659,9 +675,44 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
     });
   }
 
+  if ((password || "").trim().length < 8) {
+    return res.render("participants-new", {
+      activePage: "signup",
+      user: req.session.user || null,
+      error: "Password must be at least 8 characters.",
+      isSelfSignup: true,
+    });
+  }
+
   try {
+    const existing = await knex("participants")
+      .whereRaw("LOWER(participantemail) = LOWER(?)", [email || ""])
+      .first();
+
+    if (existing) {
+      return res.render("participants-new", {
+        activePage: "signup",
+        user: req.session.user || null,
+        error: "An account with that email already exists. Try logging in.",
+        isSelfSignup: true,
+      });
+    }
+  } catch (checkErr) {
+    console.error("Error checking existing user during signup:", checkErr);
+    return res.render("participants-new", {
+      activePage: "signup",
+      user: req.session.user || null,
+      error: "An error occurred while checking the email. Please try again.",
+      isSelfSignup: true,
+    });
+  }
+
+  try {
+    const newId = await getNextParticipantId();
+
     const [newParticipant] = await knex("participants")
       .insert({
+        participantid: newId,
         participantemail: email,
         participantfirstname: firstName,
         participantlastname: lastName,
@@ -674,7 +725,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
         participantschooloremployer: school || null,
         participantfieldofinterest: fieldOfInterest || null,
         participantphoto: photoPath,
-        participantpassword: password,
+        password: password.trim(),
       })
       .returning("*");
 
@@ -899,7 +950,10 @@ app.post(
     const photoPath = req.file ? `/images/uploads/${req.file.filename}` : null;
 
     try {
+      const newId = await getNextParticipantId();
+
       await knex("participants").insert({
+        participantid: newId,
         participantemail: email,
         participantfirstname: firstName,
         participantlastname: lastName,
@@ -912,7 +966,7 @@ app.post(
         participantschooloremployer: school || null,
         participantfieldofinterest: fieldOfInterest || null,
         participantphoto: photoPath,
-        participantpassword: password || null,
+        password: password ? password.trim() : null,
       });
 
       res.redirect("/participants");
@@ -1039,7 +1093,7 @@ app.post(
       };
 
       if (password && password.trim() !== "") {
-        updateData.participantpassword = password.trim();
+        updateData.password = password.trim();
       }
 
       await knex("participants").where("participantid", id).update(updateData);

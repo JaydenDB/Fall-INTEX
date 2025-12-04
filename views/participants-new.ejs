@@ -57,6 +57,28 @@
                 style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
             </div>
 
+            <!-- PASSWORD FIELD -->
+            <div>
+              <label style="font-size:0.8rem;">Password <%= isSelfSignup ? '' : '(optional)' %></label>
+              <input
+                name="password"
+                type="password"
+                <%= isSelfSignup ? 'required' : '' %>
+                placeholder="<%= isSelfSignup ? 'Create a password for login' : 'Leave blank to keep no password' %>"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
+              <% if (isSelfSignup) { %>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
+                  Your password will be used to log into your Ella Rises portal.
+                </p>
+              <% } else { %>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
+                  Admin note: Leave blank if the participant should log in by email only.
+                </p>
+              <% } %>
+            </div>
+            <!-- END PASSWORD FIELD -->
+
             <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Date of birth</label>
