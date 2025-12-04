@@ -13,46 +13,82 @@
 
     <section class="section">
       <div class="container">
+
         <div class="section-header" style="text-align:left;">
-                    <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 70px; height: 70px; margin-bottom: 1rem;">
+          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 70px; height: 70px; margin-bottom: 1rem;">
           <p class="section-kicker">Admin</p>
           <h2 class="section-title">Donations overview</h2>
           <p class="section-subtitle" style="margin-left:0;">
-            Recent donations recorded through the Ella Rises portal. Use this for reporting and donor stewardship.
+            Recent donations recorded through the Ella Rises portal.
           </p>
         </div>
 
-        <div class="grid-2" style="margin-bottom:1rem;">
-          <div class="card">
-            <p class="section-kicker" style="margin-bottom:0.2rem;">Total recorded</p>
-            <div style="font-size:1.8rem; font-weight:700;">
-              $<%= donationSummary ? Number(donationSummary.totalAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00' %>
-            </div>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.3rem;">
-              Across <strong><%= donationSummary ? donationSummary.donationCount : 0 %></strong> donation records.
-            </p>
+        <!-- Summary card -->
+        <div class="card" style="margin-bottom:1rem;">
+          <p class="section-kicker" style="margin-bottom:0.2rem;">Total recorded</p>
+          <div style="font-size:1.8rem; font-weight:700;">
+            $<%= donationSummary
+                ? Number(donationSummary.totalAmount).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })
+                : '0.00'
+              %>
           </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.3rem;">
+            Across <strong><%= donationSummary ? donationSummary.donationCount : 0 %></strong> donation records.
+          </p>
+        </div>
 
-          <div class="card">
-            <p style="font-size:0.85rem; color:var(--text-muted);">
-              Use this page to:
-            </p>
-            <ul style="font-size:0.85rem; color:var(--text-muted); padding-left:1.4rem; margin-top:0.3rem;">
-              <li>See the most recent gifts and their amounts.</li>
-              <li>Export data from the database for donor reporting.</li>
-              <li>Cross-reference donor emails with participants for deeper impact stories.</li>
-            </ul>
+        <!-- Search + sort controls -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; justify-content:space-between;">
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+              <label for="donationSearch" style="font-size:0.85rem; color:var(--text-muted);">
+                Search donors:
+              </label>
+              <input
+                id="donationSearch"
+                type="text"
+                placeholder="Type a donor name..."
+                style="
+                  padding:0.4rem 0.6rem;
+                  border-radius:999px;
+                  border:1px solid var(--border-soft, #e2d5f3);
+                  font-size:0.85rem;
+                  min-width:200px;
+                "
+              />
+            </div>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                data-sort="donor"
+              >
+                Sort by donor
+              </button>
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                data-sort="amount"
+              >
+                Sort by amount
+              </button>
+            </div>
           </div>
         </div>
 
+        <!-- Table -->
         <div class="card">
-          <table style="width:100%; border-collapse: collapse; font-size:0.88rem;">
+          <table id="donationsTable" style="width:100%; border-collapse: collapse; font-size:0.88rem;">
             <thead>
               <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
-                <th style="padding:0.5rem;">Date</th>
-                <th style="padding:0.5rem;">Email</th>
+                <th style="padding:0.5rem;">Donor</th>
                 <th style="padding:0.5rem;">Participant ID</th>
                 <th style="padding:0.5rem;">Amount (USD)</th>
+                <th style="padding:0.5rem;">Profile</th>
               </tr>
             </thead>
             <tbody>
@@ -63,15 +99,43 @@
                   </td>
                 </tr>
               <% } %>
-              <% donations.forEach(d => { %>
-                <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+              <% donations.forEach(d => { 
+                   // Donor name: first + last
+                   const nameParts = [];
+                   if (d.participantfirstname) nameParts.push(d.participantfirstname);
+                   if (d.participantlastname) nameParts.push(d.participantlastname);
+                   const donorLabel = nameParts.length > 0 ? nameParts.join(' ') : 'Unknown';
+
+                   const amt = d.donationamount ? Number(d.donationamount) : 0;
+              %>
+                <tr
+                  data-donor="<%= donorLabel.toLowerCase() %>"
+                  data-amount="<%= amt %>"
+                  style="border-top:1px solid rgba(245,235,255,0.9);"
+                >
                   <td style="padding:0.5rem;">
-                    <%= d.donationdate ? d.donationdate.toISOString().slice(0,10) : '—' %>
+                    <%= donorLabel %>
                   </td>
-                  <td style="padding:0.5rem;"><%= d.participantemail || '—' %></td>
-                  <td style="padding:0.5rem;"><%= d.participantid || '—' %></td>
                   <td style="padding:0.5rem;">
-                    $<%= d.donationamount ? Number(d.donationamount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00' %>
+                    <%= d.participantid || '—' %>
+                  </td>
+                  <td style="padding:0.5rem;">
+                    $<%= d.donationamount
+                          ? Number(d.donationamount).toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })
+                          : '0.00'
+                    %>
+                  </td>
+                  <td style="padding:0.5rem;">
+                    <% if (d.participantid) { %>
+                      <a href="/participants/<%= d.participantid %>" class="btn btn-ghost btn-sm">
+                        View
+                      </a>
+                    <% } else { %>
+                      —
+                    <% } %>
                   </td>
                 </tr>
               <% }) %>
@@ -83,5 +147,85 @@
 
     <%- include('partials/footer') %>
   </div>
+
+  <script>
+    (function () {
+      const searchInput = document.getElementById('donationSearch');
+      const table = document.getElementById('donationsTable');
+      if (!table) return;
+
+      const tbody = table.querySelector('tbody');
+      const allRows = Array.from(tbody.querySelectorAll('tr[data-donor]'));
+      const sortButtons = document.querySelectorAll('[data-sort]');
+      let currentSort = { key: null, direction: 1 };
+
+      function applyFilterAndSort() {
+        const query = (searchInput && searchInput.value ? searchInput.value : '').toLowerCase();
+
+        let rows = allRows.filter(row => {
+          const donor = row.dataset.donor || '';
+          return donor.includes(query);
+        });
+
+        if (currentSort.key) {
+          const key = currentSort.key;
+          const dir = currentSort.direction;
+
+          rows.sort((a, b) => {
+            let va, vb;
+
+            if (key === 'amount') {
+              va = parseFloat(a.dataset.amount || '0');
+              vb = parseFloat(b.dataset.amount || '0');
+
+              if (isNaN(va)) return 1;
+              if (isNaN(vb)) return -1;
+              if (va < vb) return -1 * dir;
+              if (va > vb) return 1 * dir;
+              return 0;
+            } else if (key === 'donor') {
+              va = (a.dataset.donor || '').toString();
+              vb = (b.dataset.donor || '').toString();
+
+              if (va < vb) return -1 * dir;
+              if (va > vb) return 1 * dir;
+              return 0;
+            }
+
+            return 0;
+          });
+        }
+
+        // Rebuild tbody
+        tbody.innerHTML = '';
+        if (rows.length === 0) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="4" style="padding:0.8rem; color:var(--text-muted);">No donations match your search.</td>';
+          tbody.appendChild(emptyRow);
+        } else {
+          rows.forEach(row => tbody.appendChild(row));
+        }
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilterAndSort);
+      }
+
+      sortButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.sort;
+          if (currentSort.key === key) {
+            currentSort.direction *= -1; // toggle asc/desc
+          } else {
+            currentSort.key = key;
+            currentSort.direction = (key === 'amount') ? -1 : 1;
+          }
+          applyFilterAndSort();
+        });
+      });
+
+      applyFilterAndSort();
+    })();
+  </script>
 </body>
 </html>

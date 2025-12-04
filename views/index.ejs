@@ -31,8 +31,7 @@
             through Ella Rises programs.
           </h1>
           <p class="hero-subtitle">
-            This portal tracks participants, events, surveys, milestones, and donations so the Ella Rises
-            team and donors can see the impact of every workshop and program.
+            This portal helps track participants, events, surveys, milestones, and donations so we can see the impact of every Ella Rises experience.
           </p>
 
           <div class="hero-actions">
@@ -64,7 +63,7 @@
             </div>
           </div>
         </div>
-        <!-- Note: hero-card / picture block removed on purpose -->
+        <!-- hero-card block intentionally removed -->
       </div>
     </section>
 
@@ -73,9 +72,9 @@
       <div class="container">
         <div class="section-header">
           <p class="section-kicker">Events</p>
-          <h2 class="section-title">Upcoming Ella Rises Experiences</h2>
+          <h2 class="section-title">Upcoming Ella Rises experiences</h2>
           <p class="section-subtitle">
-            Highlight a few key events from the database so donors and participants can see what’s happening next.
+            A glimpse at a few events coming up next.
           </p>
         </div>
 
@@ -103,8 +102,7 @@
           <p class="section-kicker">Milestones</p>
           <h2 class="section-title">Long-term success indicators</h2>
           <p class="section-subtitle">
-            These are examples of milestones you’ll track: college enrollment, STEAM majors, internships,
-            and post-college STEAM jobs.
+            We celebrate progress in education, STEAM pathways, and early career opportunities.
           </p>
         </div>
 
@@ -130,22 +128,26 @@
           <p class="section-kicker">Donors</p>
           <h2 class="section-title">Our current supporters</h2>
           <p class="section-subtitle">
-            Show high-level donation impact here to keep donors excited and recognize key partners.
+            Recognizing some of the people whose generosity makes Ella Rises possible.
           </p>
         </div>
 
         <div class="grid-2">
+          <!-- Featured donors -->
           <div class="card">
             <h3 style="margin-bottom: 0.6rem;">Featured donors</h3>
             <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted);">
-              <% donors.forEach(d => { %>
+              <% donors.forEach(d => { 
+                   const donorLabel = d.displayName || d.name || d.email || '';
+              %>
                 <li style="margin-bottom: 0.4rem;">
-                  <strong><%= d.name %></strong> – <%= d.level %> supporter
+                  <strong><%= donorLabel %></strong> – <%= d.level %> supporter
                 </li>
               <% }) %>
             </ul>
           </div>
 
+          <!-- Donor CTA -->
           <div class="card">
             <span class="badge badge-accent">Become a donor</span>
             <h3 style="margin: 0.6rem 0 0.3rem;">Help girls succeed in STEAM</h3>
