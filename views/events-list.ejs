@@ -22,6 +22,14 @@
           </p>
         </div>
 
+        <% if (user && user.role === 'admin') { %>
+          <div style="margin-bottom:0.9rem; text-align:right;">
+            <a href="/events/new" class="btn btn-primary btn-sm">
+              + Add new event template
+            </a>
+          </div>
+        <% } %>
+
         <div class="card">
           <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
             <thead>
