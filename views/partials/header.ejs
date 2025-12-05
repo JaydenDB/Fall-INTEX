@@ -1,6 +1,7 @@
 <header class="site-header">
   <div class="container header-inner" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.75rem 0;">
-    <!-- Left: Logo / brand -->
+
+    <!-- logo and site title on the left -->
     <a href="/" class="brand" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
       <img
         src="/images/ella%20rises%20logo.png"
@@ -12,8 +13,10 @@
       </span>
     </a>
 
-    <!-- Middle: Main navigation -->
+    <!-- main nav section in the center -->
     <nav class="main-nav" style="display:flex; align-items:center; gap:0.9rem; font-size:0.9rem;">
+
+      <!-- home link with active state -->
       <a
         href="/"
         class="nav-link <%= activePage === 'home' ? 'is-active' : '' %>"
@@ -24,7 +27,8 @@
 
       <% if (user) { %>
         <% if (user.role === 'admin') { %>
-          <!-- ADMIN NAV (no My portal, no Donate, no Impact dashboards) -->
+
+          <!-- admin navigation -->
           <a
             href="/events"
             class="nav-link <%= activePage === 'events' ? 'is-active' : '' %>"
@@ -56,8 +60,10 @@
           >
             Donations
           </a>
+
         <% } else { %>
-          <!-- PARTICIPANT NAV -->
+
+          <!-- participant navigation -->
           <a
             href="/me"
             class="nav-link <%= activePage === 'me' ? 'is-active' : '' %>"
@@ -81,9 +87,11 @@
           >
             Donate
           </a>
+
         <% } %>
       <% } else { %>
-        <!-- Public/anonymous user navigation -->
+
+        <!-- navigation when not logged in -->
         <a
           href="/events"
           class="nav-link <%= activePage === 'events' ? 'is-active' : '' %>"
@@ -99,12 +107,15 @@
         >
           Donate
         </a>
+
       <% } %>
     </nav>
 
-    <!-- Right: auth buttons / user pill -->
+    <!-- right side: login, logout, or user info -->
     <div class="header-actions" style="display:flex; align-items:center; gap:0.6rem; font-size:0.85rem;">
+
       <% if (user) { %>
+        <!-- shows user name/email and role -->
         <span
           class="user-pill"
           style="
@@ -121,6 +132,8 @@
         >
           <%= user.name || user.email %> · <%= user.role === 'admin' ? 'Admin' : 'Participant' %>
         </span>
+
+        <!-- logout button -->
         <a
           href="/logout"
           class="btn btn-ghost btn-sm"
@@ -128,7 +141,10 @@
         >
           Log out
         </a>
+
       <% } else { %>
+
+        <!-- login button for visitors -->
         <a
           href="/login"
           class="btn btn-ghost btn-sm"
@@ -136,6 +152,8 @@
         >
           Log in
         </a>
+
+        <!-- signup button for visitors -->
         <a
           href="/signup"
           class="btn btn-primary btn-sm"
@@ -149,7 +167,9 @@
         >
           Sign up
         </a>
+
       <% } %>
+
     </div>
   </div>
 </header>

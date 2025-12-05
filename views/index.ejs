@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- base setup -->
   <meta charset="UTF-8" />
   <title>Ella Rises – Impact Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- fonts + styles -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+
+    <!-- site header -->
     <%- include('partials/header') %>
 
-    <!-- HERO WITH CAROUSEL BACKGROUND -->
+    <!-- HERO WITH BACKGROUND CAROUSEL -->
     <section class="hero hero-carousel">
-      <!-- Background carousel images -->
       <div class="hero-carousel-bg">
-        <img id="carouselBgImage1" class="hero-carousel-img" src="" alt="Background carousel">
-        <img id="carouselBgImage2" class="hero-carousel-img" src="" alt="Background carousel">
+        <img id="carouselBgImage1" class="hero-carousel-img" src="" alt="">
+        <img id="carouselBgImage2" class="hero-carousel-img" src="" alt="">
         <div class="hero-carousel-overlay"></div>
       </div>
 
@@ -25,29 +29,30 @@
           <div class="hero-tag">
             <span>WELCOME</span><span>•</span><span>Ella Rises Impact Portal</span>
           </div>
+
           <h1 class="hero-title">
             Measuring how girls
             <span class="hero-highlight">rise, learn, and succeed</span>
             through Ella Rises programs.
           </h1>
+
           <p class="hero-subtitle">
             This portal helps track participants, events, surveys, milestones, and donations so we can see the impact of every Ella Rises experience.
           </p>
 
+          <!-- hero action buttons -->
           <div class="hero-actions">
             <% if (!user) { %>
-              <!-- Logged-out -->
               <a class="btn btn-primary" href="/login">Log In to Manage Data</a>
             <% } else if (user.role === 'admin') { %>
-              <!-- Admin -->
               <a class="btn btn-primary" href="/admin/dashboard">Go to Admin Dashboard</a>
             <% } else { %>
-              <!-- Normal participant -->
               <a class="btn btn-primary" href="/me">Go to My Portal</a>
             <% } %>
             <a class="btn btn-ghost" href="#donors">View Current Donors</a>
           </div>
 
+          <!-- quick stats -->
           <div class="hero-meta">
             <div>
               <strong><%= stats.totalParticipants || '—' %></strong>
@@ -63,7 +68,6 @@
             </div>
           </div>
         </div>
-        <!-- hero-card block intentionally removed -->
       </div>
     </section>
 
@@ -72,14 +76,10 @@
       <div class="container">
         <div class="section-header">
           <p class="section-kicker">Events</p>
-
           <h2 class="section-title">
             <a href="/events">Upcoming Ella Rises Events</a>
           </h2>
-
-          <p class="section-subtitle">
-            A glimpse at a few events coming up next.
-          </p>
+          <p class="section-subtitle">A glimpse at a few events coming up next.</p>
         </div>
 
         <div class="grid-3">
@@ -106,7 +106,7 @@
           <p class="section-kicker">Milestones</p>
           <h2 class="section-title">Long-Term Success Indicators</h2>
           <p class="section-subtitle">
-            We celebrate progress in education, STEAM pathways, and early career opportunities.
+            Progress in education, STEAM pathways, and early career opportunities.
           </p>
         </div>
 
@@ -132,12 +132,12 @@
           <p class="section-kicker">Donors</p>
           <h2 class="section-title">Our Current Supporters</h2>
           <p class="section-subtitle">
-            Recognizing some of the people whose generosity makes Ella Rises possible.
+            Recognizing the people whose generosity makes Ella Rises possible.
           </p>
         </div>
 
         <div class="grid-2">
-          <!-- Featured donors -->
+          <!-- donor list -->
           <div class="card">
             <h3 style="margin-bottom: 0.6rem;">Featured Donors</h3>
             <ul style="list-style: none; font-size: 0.9rem; color: var(--text-muted);">
@@ -151,27 +151,32 @@
             </ul>
           </div>
 
-          <!-- Donor CTA -->
+          <!-- donor CTA -->
           <div class="card">
             <span class="badge badge-accent">Become a Donor</span>
             <h3 style="margin: 0.6rem 0 0.3rem;">Help girls succeed in STEAM</h3>
             <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.9rem;">
-              Donations fund instruments, supplies, summit days, and mentoring that lead to measurable milestones.
+              Donations fund supplies, events, and mentoring that lead to measurable milestones.
             </p>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+
+            <div style="display:flex; flex-wrap:wrap; gap:0.6rem;">
               <a href="/donations/new" class="btn btn-primary">Become a Donor</a>
+
               <% if (user && user.role === 'admin') { %>
-                <a href="/dashboard/public" class="btn btn-ghost">See Impact Metrics</a>
+                <a href="/admin/dashboard" class="btn btn-ghost">See Impact Metrics</a>
               <% } %>
-            </div>            
+            </div>
           </div>
         </div>
+
       </div>
     </section>
 
+    <!-- site footer -->
     <%- include('partials/footer') %>
   </div>
 
+  <!-- simple carousel script -->
   <script>
     let carouselImages = [];
     let currentImageIndex = 0;
@@ -195,22 +200,22 @@
     }
 
     function rotateImages() {
-      setInterval(() => {
-        fadeToNextImage();
-      }, displayDuration + transitionDuration);
+      setInterval(() => fadeToNextImage(), displayDuration + transitionDuration);
     }
 
     function fadeToNextImage() {
       const img1 = document.getElementById('carouselBgImage1');
       const img2 = document.getElementById('carouselBgImage2');
       const img1Visible = img1.style.opacity !== '0';
+
       const activeImg = img1Visible ? img1 : img2;
-      const inactiveImg = img1Visible ? img2 : img1;
+      const nextImg = img1Visible ? img2 : img1;
+
       currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
-      inactiveImg.src = carouselImages[currentImageIndex];
-      inactiveImg.style.opacity = '0';
+      nextImg.src = carouselImages[currentImageIndex];
+
       activeImg.style.opacity = '0';
-      inactiveImg.style.opacity = '1';
+      nextImg.style.opacity = '1';
     }
 
     document.addEventListener('DOMContentLoaded', initializeCarousel);

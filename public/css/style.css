@@ -312,7 +312,7 @@ img {
 }
 
 .alert-success {
-  background: rgba(154, 181, 157, 0.12); /* soft sage tint */
+  background: rgba(154, 181, 157, 0.12);
   border-radius: 12px;
   padding: 0.6rem 0.8rem;
   font-size: 0.82rem;
@@ -346,7 +346,6 @@ img {
   color: var(--primary-dark);
 }
 
-/* Little colored dot for cute effects */
 .dot {
   width: 8px;
   height: 8px;
@@ -436,7 +435,6 @@ img {
   width: 60%;
 }
 
-/* Hamburger for mobile (you can toggle it with JS) */
 .nav-menu-toggle {
   display: none;
   width: 34px;
@@ -487,13 +485,13 @@ img {
 .hero-highlight {
   background: linear-gradient(
     120deg,
-    #d6c6ff,  /* light lavender */
-    #ffb9a0   /* light coral-peach */
+    #d6c6ff,
+    #ffb9a0
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.35); /* subtle glow for readability */
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.35);
 }
 
 .hero-subtitle {
@@ -579,7 +577,6 @@ img {
   border: 1px solid rgba(255, 255, 255, 0.7);
 }
 
-/* little butterfly accent */
 .hero-butterfly {
   position: absolute;
   right: 0.6rem;
@@ -614,14 +611,12 @@ img {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
 }
 
-/* 3-column grid for programs or features */
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
 }
 
-/* 2-column grid */
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -737,7 +732,6 @@ img {
     display: inline-flex;
   }
 
-  /* When you add a "nav-menu-open" class with JS */
   .nav-menu-open .nav-links {
     display: flex;
     position: absolute;
@@ -769,18 +763,17 @@ img {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
 /* ========== CUSTOM STYLES FOR ELLA RISES PAGES ========== */
-/* Lower the logo on the hero card a bit */
 .hero-card-logo {
   right: -0.2rem;
-  bottom: -0.3rem;   /* lower than before */
+  bottom: -0.3rem;
   width: 80px;
   height: 80px;
   object-fit: contain;
   opacity: 0.8;
 }
 
-/* Home events section: events + side image card */
 .home-events-layout {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
@@ -789,7 +782,7 @@ img {
 }
 
 .home-events-image-card {
-  padding: 0;           /* let the image fill the card */
+  padding: 0;
   overflow: hidden;
 }
 
@@ -801,7 +794,6 @@ img {
   border-radius: var(--radius-lg);
 }
 
-/* Stack on mobile nicely */
 @media (max-width: 900px) {
   .home-events-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -812,7 +804,6 @@ img {
   }
 }
 
-/* Large banner images for sections (ella rises 1/2/3) */
 .feature-banner {
   width: 100%;
   max-height: 260px;
@@ -830,14 +821,14 @@ img {
 
 .section-title a:hover,
 .section-title a:focus {
-  color: var(--primary-dark); /* or #CE325B */
-  text-shadow: 0 0 6px rgba(151,142,196,0.21); /* subtle glow/underline effect */
-  text-decoration: underline; /* optional: shows underline on hover for clarity */
+  color: var(--primary-dark);
+  text-shadow: 0 0 6px rgba(151,142,196,0.21);
+  text-decoration: underline;
 }
 
 .ella-input,
 .ella-select {
-  border-radius: var(--radius-pill); /* matches button pill shape */
+  border-radius: var(--radius-pill);
   border: none;
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: #fff;
@@ -896,4 +887,48 @@ img {
     padding: 0.8rem 1rem;
     margin: 0.3rem 0;
   }
+}
+/* ====== SMALL ADDITIONS: GENERIC FORM + TABLE STYLES ====== */
+
+/* Generic form controls (for pages still using plain inputs) */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+textarea,
+select {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  width: 100%;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid rgba(151, 142, 196, 0.45);
+  outline-offset: 1px;
+}
+
+/* Default table look that matches all your admin pages */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  font-size: 0.86rem;
+  padding: 0.45rem 0.5rem;
+}
+
+thead tr {
+  border-bottom: 1px solid rgba(235, 216, 255, 0.9);
+}
+
+tbody tr + tr {
+  border-top: 1px solid rgba(245, 235, 255, 0.9);
 }

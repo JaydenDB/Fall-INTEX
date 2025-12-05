@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ella Rises – <%= isSelfSignup ? 'Create your account' : 'Add Participant' %></title>
+  <title>Ella Rises – <%= isSelfSignup ? 'Create your account' : 'Add participant' %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
@@ -36,38 +36,91 @@
             method="POST"
             action="<%= isSelfSignup ? '/signup' : '/participants/new' %>"
             enctype="multipart/form-data"
+            autocomplete="<%= isSelfSignup ? 'on' : 'off' %>"
             style="display:flex; flex-direction:column; gap:0.7rem;"
           >
+            <!-- First / last name -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">First name</label>
-                <input name="firstName" type="text" required
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="firstName"
+                  type="text"
+                  required
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">Last name</label>
-                <input name="lastName" type="text" required
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="lastName"
+                  type="text"
+                  required
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
             </div>
 
+            <!-- Email -->
             <div>
               <label style="font-size:0.8rem;">Email</label>
-              <input name="email" type="email" required
-                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              <input
+                name="email"
+                type="email"
+                required
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
             </div>
 
+            <!-- Password -->
+            <div>
+              <label style="font-size:0.8rem;">
+                Password <%= isSelfSignup ? '' : '(optional)' %>
+              </label>
+
+              <% if (isSelfSignup) { %>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Create a password for login"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
+                  Your password will be used to log into your Ella Rises portal.
+                </p>
+              <% } else { %>
+                <input
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Leave blank to keep no password"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
+                  Admin note: Leave blank if the participant should log in by email only.
+                </p>
+              <% } %>
+            </div>
+
+            <!-- DOB + role (role only for admins) -->
             <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Date of birth</label>
-                <input name="dob" type="date"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="dob"
+                  type="date"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
+
               <% if (!isSelfSignup) { %>
                 <div>
                   <label style="font-size:0.8rem;">Role</label>
-                  <select name="role"
-                    style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;">
+                  <select
+                    name="role"
+                    style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                  >
                     <option value="participant" selected>Participant</option>
                     <option value="admin">Admin</option>
                   </select>
@@ -75,43 +128,65 @@
               <% } %>
             </div>
 
+            <!-- Phone + city -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Phone</label>
-                <input name="phone" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="phone"
+                  type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">City</label>
-                <input name="city" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="city"
+                  type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
             </div>
 
+            <!-- State / Zip / School -->
             <div style="display:grid; grid-template-columns:0.6fr 0.8fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">State</label>
-                <input name="state" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="state"
+                  type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">Zip</label>
-                <input name="zip" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="zip"
+                  type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
               <div>
                 <label style="font-size:0.8rem;">School / Employer</label>
-                <input name="school" type="text"
-                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+                <input
+                  name="school"
+                  type="text"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
               </div>
             </div>
 
+            <!-- Field of interest -->
             <div>
               <label style="font-size:0.8rem;">Field of interest</label>
-              <input name="fieldOfInterest" type="text"
-                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;" />
+              <input
+                name="fieldOfInterest"
+                type="text"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
             </div>
 
+            <!-- Profile photo -->
             <div>
               <label style="font-size:0.8rem;">Profile photo (optional)</label>
               <input
@@ -125,10 +200,12 @@
               </p>
             </div>
 
+            <!-- Buttons -->
             <div style="margin-top:0.7rem; display:flex; gap:0.7rem;">
               <button type="submit" class="btn btn-primary">
                 <%= isSelfSignup ? 'Create my account' : 'Save participant' %>
               </button>
+
               <% if (!isSelfSignup) { %>
                 <a href="/participants" class="btn btn-ghost">Cancel</a>
               <% } %>

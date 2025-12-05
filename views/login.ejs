@@ -1,41 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- base page setup -->
   <meta charset="UTF-8" />
   <title>Ella Rises – Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- fonts + global styles -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+
+    <!-- site header -->
     <%- include('partials/header') %>
 
     <section class="section">
       <div class="container" style="max-width: 520px;">
-        <!-- Page heading -->
+
+        <!-- page intro -->
         <div class="section-header">
-          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
+          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" 
+               style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
           <p class="section-kicker">Account</p>
           <h2 class="section-title">Log in to Ella Rises Portal</h2>
           <p class="section-subtitle">
-            Use your email and password to access the portal. Admins see management tools; participants see their own events and progress.
+            Portal login. Admins get admin tools; participants see their own info.
           </p>
         </div>
 
-        <!-- Login card -->
+        <!-- login form container -->
         <div class="card">
+
+          <!-- error message if login fails -->
           <% if (error) { %>
             <div class="alert-error">
               <%= error %>
             </div>
           <% } %>
 
-          <form method="POST" action="/login" style="display:flex; flex-direction:column; gap:0.9rem;">
+          <!-- login form -->
+          <form method="POST" action="/login" 
+                style="display:flex; flex-direction:column; gap:0.9rem;">
+
+            <!-- email input -->
             <div>
-              <label for="email" style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">
+              <label for="email" 
+                     style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">
                 Email
               </label>
+
               <input
                 type="email"
                 id="email"
@@ -52,10 +67,13 @@
               />
             </div>
 
+            <!-- password input -->
             <div>
-              <label for="password" style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">
+              <label for="password" 
+                     style="display:block; font-size:0.85rem; margin-bottom:0.25rem;">
                 Password
               </label>
+
               <input
                 type="password"
                 id="password"
@@ -71,6 +89,7 @@
               />
             </div>
 
+            <!-- submit button -->
             <button
               type="submit"
               class="btn btn-primary"
@@ -79,20 +98,25 @@
               Log in
             </button>
 
+            <!-- info box for students testing the system -->
             <div style="margin-top:0.8rem; font-size:0.8rem; color:var(--text-muted);">
               <p style="margin-bottom:0.3rem;">
-                For this class project, accounts are usually created by an Ella Rises admin or via the signup form.
+                Accounts for this class project are usually created by an admin or from signup.
               </p>
               <p>
-                If you think you should have access, please contact an administrator or email
-                <a href="mailto:info@ellarises.org" style="text-decoration:underline;">info@ellarises.org</a>.
+                Need access? Contact an administrator or email
+                <a href="mailto:info@ellarises.org" style="text-decoration:underline;">
+                  info@ellarises.org
+                </a>.
               </p>
             </div>
+
           </form>
         </div>
       </div>
     </section>
 
+    <!-- site footer -->
     <%- include('partials/footer') %>
   </div>
 </body>

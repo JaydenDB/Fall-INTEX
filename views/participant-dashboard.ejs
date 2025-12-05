@@ -1,32 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- base setup for the page -->
   <meta charset="UTF-8" />
   <title>Ella Rises – My Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- fonts + shared styles -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+
+    <!-- main site header -->
     <%- include('partials/header') %>
 
     <section class="section">
       <div class="container">
+
+        <!-- page intro for the participant dashboard -->
         <div class="section-header" style="text-align:left;">
-          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 70px; height: 70px; margin-bottom: 1rem;">
+          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo"
+               style="width: 70px; height: 70px; margin-bottom: 1rem;">
           <p class="section-kicker">My journey</p>
-          <h2 class="section-title">Welcome, <%= participant.participantfirstname || 'Participant' %></h2>
+          <h2 class="section-title">
+            Welcome, <%= participant.participantfirstname || 'Participant' %>
+          </h2>
           <p class="section-subtitle" style="margin-left:0;">
             This page shows your Ella Rises profile, events, surveys, milestones, and donations.
             Only you and admins can see this view.
           </p>
         </div>
 
+        <!-- top row: profile + quick stats -->
         <div class="grid-2" style="margin-bottom:1.5rem;">
+
           <!-- Profile card -->
           <div class="card">
             <div style="display:flex; gap:1rem; align-items:center; margin-bottom:0.9rem;">
+              <!-- avatar circle: either photo or initials -->
               <div
                 style="
                   width:64px;
@@ -43,11 +56,14 @@
                 "
               >
                 <% if (participant.participantphoto) { %>
-                  <img src="<%= participant.participantphoto %>" alt="Profile photo" style="width:100%; height:100%; object-fit:cover;" />
+                  <img src="<%= participant.participantphoto %>" alt="Profile photo"
+                       style="width:100%; height:100%; object-fit:cover;" />
                 <% } else { %>
                   <%= (participant.participantfirstname || '?')[0] %><%= (participant.participantlastname || '')[0] || '' %>
                 <% } %>
               </div>
+
+              <!-- name + email -->
               <div>
                 <div style="font-weight:700; font-size:1.05rem;">
                   <%= (participant.participantfirstname || '') + ' ' + (participant.participantlastname || '') %>
@@ -58,17 +74,22 @@
               </div>
             </div>
 
+            <!-- basic profile details -->
             <div style="font-size:0.85rem;">
-              <p><strong>City / State:</strong>
+              <p>
+                <strong>City / State:</strong>
                 <%= participant.participantcity || '—' %>, <%= participant.participantstate || '—' %>
               </p>
-              <p><strong>School / Employer:</strong>
+              <p>
+                <strong>School / Employer:</strong>
                 <%= participant.participantschooloremployer || '—' %>
               </p>
-              <p><strong>Field of interest:</strong>
+              <p>
+                <strong>Field of interest:</strong>
                 <%= participant.participantfieldofinterest || '—' %>
               </p>
-              <p><strong>Phone:</strong>
+              <p>
+                <strong>Phone:</strong>
                 <%= participant.participantphone || '—' %>
               </p>
             </div>
@@ -78,51 +99,80 @@
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.3rem;">My stats</p>
             <div style="display:flex; flex-wrap:wrap; gap:1.1rem; font-size:0.9rem;">
+
+              <!-- total donations -->
               <div>
                 <div style="font-size:1.5rem; font-weight:700;">
-                  $<%= stats.donations.totalAmount.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) %>
+                  $<%= stats.donations.totalAmount.toLocaleString('en-US', {
+                        minimumFractionDigits:2,
+                        maximumFractionDigits:2
+                      }) %>
                 </div>
                 <div style="color:var(--text-muted);">Total donations</div>
               </div>
+
+              <!-- events registered -->
               <div>
-                <div style="font-size:1.5rem; font-weight:700;"><%= stats.registrations.totalRegistrations %></div>
+                <div style="font-size:1.5rem; font-weight:700;">
+                  <%= stats.registrations.totalRegistrations %>
+                </div>
                 <div style="color:var(--text-muted);">Events registered</div>
               </div>
+
+              <!-- events attended -->
               <div>
-                <div style="font-size:1.5rem; font-weight:700;"><%= stats.registrations.totalAttended %></div>
+                <div style="font-size:1.5rem; font-weight:700;">
+                  <%= stats.registrations.totalAttended %>
+                </div>
                 <div style="color:var(--text-muted);">Events attended</div>
               </div>
+
+              <!-- survey count -->
               <div>
-                <div style="font-size:1.5rem; font-weight:700;"><%= stats.surveys.totalSurveys %></div>
+                <div style="font-size:1.5rem; font-weight:700;">
+                  <%= stats.surveys.totalSurveys %>
+                </div>
                 <div style="color:var(--text-muted);">Surveys submitted</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Survey & donation summaries -->
+        <!-- Survey & donation summary row -->
         <div class="grid-2" style="margin-bottom:1.5rem;">
+
+          <!-- survey averages card -->
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.3rem;">My survey experience</p>
+
             <% if (stats.surveys.totalSurveys > 0) { %>
               <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.4rem;">
                 Averages based on <strong><%= stats.surveys.totalSurveys %></strong> surveys you’ve submitted.
               </p>
+
               <div style="display:flex; flex-wrap:wrap; gap:1.1rem; font-size:0.9rem;">
                 <div>
-                  <div style="font-size:1.4rem; font-weight:700;"><%= stats.surveys.avgOverall %> / 5</div>
+                  <div style="font-size:1.4rem; font-weight:700;">
+                    <%= stats.surveys.avgOverall %> / 5
+                  </div>
                   <div style="color:var(--text-muted);">Overall</div>
                 </div>
                 <div>
-                  <div style="font-size:1.2rem; font-weight:700;"><%= stats.surveys.avgSatisfaction %> / 5</div>
+                  <div style="font-size:1.2rem; font-weight:700;">
+                    <%= stats.surveys.avgSatisfaction %> / 5
+                  </div>
                   <div style="color:var(--text-muted);">Satisfaction</div>
                 </div>
                 <div>
-                  <div style="font-size:1.2rem; font-weight:700;"><%= stats.surveys.avgUsefulness %> / 5</div>
+                  <div style="font-size:1.2rem; font-weight:700;">
+                    <%= stats.surveys.avgUsefulness %> / 5
+                  </div>
                   <div style="color:var(--text-muted);">Usefulness</div>
                 </div>
                 <div>
-                  <div style="font-size:1.2rem; font-weight:700;"><%= stats.surveys.avgRecommend %> / 5</div>
+                  <div style="font-size:1.2rem; font-weight:700;">
+                    <%= stats.surveys.avgRecommend %> / 5
+                  </div>
                   <div style="color:var(--text-muted);">Would recommend</div>
                 </div>
               </div>
@@ -133,27 +183,37 @@
             <% } %>
           </div>
 
+          <!-- donation history card -->
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.3rem;">My giving</p>
+
             <% if (stats.donations.donationCount > 0) { %>
               <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.4rem;">
                 Thank you for supporting other girls through Ella Rises programs.
               </p>
               <p style="font-size:0.85rem; color:var(--text-muted);">
                 Gifts made: <strong><%= stats.donations.donationCount %></strong><br/>
-                First gift: <%= stats.donations.firstDonation ? stats.donations.firstDonation.toISOString().slice(0,10) : '—' %><br/>
-                Most recent: <%= stats.donations.lastDonation ? stats.donations.lastDonation.toISOString().slice(0,10) : '—' %>
+                First gift:
+                <%= stats.donations.firstDonation
+                      ? stats.donations.firstDonation.toISOString().slice(0,10)
+                      : '—' %><br/>
+                Most recent:
+                <%= stats.donations.lastDonation
+                      ? stats.donations.lastDonation.toISOString().slice(0,10)
+                      : '—' %>
               </p>
             <% } else { %>
               <p style="font-size:0.9rem; color:var(--text-muted);">
-                You haven’t made a donation in this system yet. That’s totally fine—your participation is valuable too!
+                You haven’t made a donation in this system yet. Your participation is valuable too.
               </p>
             <% } %>
           </div>
         </div>
 
-        <!-- Recent activity -->
+        <!-- bottom row: recent surveys + milestones -->
         <div class="grid-2">
+
+          <!-- recent surveys table -->
           <div class="card">
             <h3 style="margin-bottom:0.4rem;">Recent surveys</h3>
             <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
@@ -174,11 +234,17 @@
                 <% } else { %>
                   <% stats.surveys.recent.forEach(s => { %>
                     <tr style="border-top:1px solid rgba(245,235,255,0.9);">
-                      <td style="padding:0.4rem;"><%= s.eventname || 'Event' %></td>
                       <td style="padding:0.4rem;">
-                        <%= s.surveysubmissiondate ? s.surveysubmissiondate.toISOString().slice(0,10) : '—' %>
+                        <%= s.eventname || 'Event' %>
                       </td>
-                      <td style="padding:0.4rem;"><%= s.surveyoverallscore || '—' %></td>
+                      <td style="padding:0.4rem;">
+                        <%= s.surveysubmissiondate
+                              ? s.surveysubmissiondate.toISOString().slice(0,10)
+                              : '—' %>
+                      </td>
+                      <td style="padding:0.4rem;">
+                        <%= s.surveyoverallscore || '—' %>
+                      </td>
                     </tr>
                   <% }) %>
                 <% } %>
@@ -186,19 +252,23 @@
             </table>
           </div>
 
+          <!-- milestones list -->
           <div class="card">
             <h3 style="margin-bottom:0.4rem;">My milestones</h3>
             <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem;">
               <% if (!stats.milestones || stats.milestones.length === 0) { %>
                 <li style="padding:0.4rem 0; color:var(--text-muted);">
-                  No milestones recorded yet. As you reach key education and career moments, Ella Rises staff can log them here.
+                  No milestones recorded yet. As you reach key education and career
+                  moments, Ella Rises staff can log them here.
                 </li>
               <% } else { %>
                 <% stats.milestones.forEach(m => { %>
                   <li style="padding:0.35rem 0; border-bottom:1px solid rgba(245,235,255,0.9);">
                     <strong><%= m.milestonetitle %></strong><br/>
                     <span style="font-size:0.78rem; color:var(--text-muted);">
-                      <%= m.milestonedate ? m.milestonedate.toISOString().slice(0,10) : '—' %>
+                      <%= m.milestonedate
+                            ? m.milestonedate.toISOString().slice(0,10)
+                            : '—' %>
                     </span>
                   </li>
                 <% }) %>
@@ -206,9 +276,11 @@
             </ul>
           </div>
         </div>
+
       </div>
     </section>
 
+    <!-- shared footer -->
     <%- include('partials/footer') %>
   </div>
 </body>

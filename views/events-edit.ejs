@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- basic page setup -->
+  <meta charset="UTF-8" />
+  <title>Ella Rises – Edit Event Template</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- fonts + main stylesheet -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <!-- shared header (logo, nav, auth) -->
+    <%- include('partials/header') %>
+
+    <section class="section">
+      <div class="container" style="max-width:700px;">
+
+        <!-- page header / explanation -->
+        <div class="section-header" style="text-align:left;">
+          <p class="section-kicker">Events</p>
+          <h2 class="section-title">Edit event template</h2>
+          <p class="section-subtitle" style="margin-left:0;">
+            Update the details for this reusable event template. Changes here will affect future occurrences, not past data.
+          </p>
+        </div>
+
+        <div class="card">
+          <!-- show error from server if something went wrong -->
+          <% if (error) { %>
+            <div class="alert-error">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <!-- edit form posts back to the same template id -->
+          <form
+            method="POST"
+            action="/events/<%= eventTemplate.eventtemplateid %>/edit"
+            style="display:flex; flex-direction:column; gap:0.7rem;"
+          >
+
+            <!-- event name (required) -->
+            <div>
+              <label style="font-size:0.8rem;">Event name</label>
+              <input
+                type="text"
+                name="eventName"
+                required
+                value="<%= eventTemplate.eventname || '' %>"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
+            </div>
+
+            <!-- basic event metadata: type + default capacity -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div>
+                <label style="font-size:0.8rem;">Event type</label>
+                <input
+                  type="text"
+                  name="eventType"
+                  placeholder="Workshop, Summit, Club, etc."
+                  value="<%= eventTemplate.eventtype || '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+              <div>
+                <label style="font-size:0.8rem;">Default capacity</label>
+                <input
+                  type="number"
+                  min="0"
+                  name="defaultCapacity"
+                  value="<%= (eventTemplate.eventdefaultcapacity != null) ? eventTemplate.eventdefaultcapacity : '' %>"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
+              </div>
+            </div>
+
+            <!-- optional recurrence pattern description -->
+            <div>
+              <label style="font-size:0.8rem;">Recurrence pattern (optional)</label>
+              <input
+                type="text"
+                name="recurrencePattern"
+                placeholder="e.g., Monthly on Saturdays"
+                value="<%= eventTemplate.eventrecurrencepattern || '' %>"
+                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+              />
+            </div>
+
+            <!-- free-text description of the event template -->
+            <div>
+              <label style="font-size:0.8rem;">Description</label>
+              <textarea
+                name="eventDescription"
+                rows="4"
+                style="width:100%; padding:0.6rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem; resize:vertical;"
+              ><%= eventTemplate.eventdescription || '' %></textarea>
+            </div>
+
+            <!-- actions: save or go back to event detail page -->
+            <div style="margin-top:0.7rem; display:flex; gap:0.7rem;">
+              <button type="submit" class="btn btn-primary">
+                Save changes
+              </button>
+              <a href="/events/<%= eventTemplate.eventtemplateid %>" class="btn btn-ghost">
+                Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- shared footer -->
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>
