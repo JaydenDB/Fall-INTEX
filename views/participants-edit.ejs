@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- basic page setup for this view -->
   <meta charset="UTF-8" />
   <title>Ella Rises – Edit Participant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- shared fonts and main stylesheet -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+    <!-- site header reused across pages -->
     <%- include('partials/header') %>
 
     <section class="section">
       <div class="container" style="max-width:640px;">
+
+        <!-- page heading and short explanation -->
         <div class="section-header" style="text-align:left;">
           <p class="section-kicker">Participants</p>
           <h2 class="section-title">Edit participant</h2>
@@ -23,18 +29,23 @@
 
         <div class="card">
           <% if (error) { %>
+            <!-- simple error message if the server passed one in -->
             <div class="alert-error">
               <%= error %>
             </div>
           <% } %>
 
+          <!-- main edit form for this participant -->
+          <!-- enctype is multipart because we support photo upload -->
           <form
             method="POST"
             action="/participants/<%= participant.participantid %>/edit"
             enctype="multipart/form-data"
             style="display:flex; flex-direction:column; gap:0.7rem;"
           >
+            <!-- small header row with avatar and quick metadata -->
             <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.6rem;">
+              <!-- avatar circle: either profile photo or initials -->
               <div
                 style="
                   width:56px;
@@ -59,12 +70,15 @@
                   <%= (participant.participantfirstname || '?')[0] %><%= (participant.participantlastname || '')[0] || '' %>
                 <% } %>
               </div>
+
+              <!-- id and current role for quick reference -->
               <div style="font-size:0.85rem; color:var(--text-muted);">
                 <div><strong>Participant ID:</strong> <%= participant.participantid %></div>
                 <div><strong>Current role:</strong> <%= participant.participantrole || 'participant' %></div>
               </div>
             </div>
 
+            <!-- basic name fields -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">First name</label>
@@ -88,6 +102,7 @@
               </div>
             </div>
 
+            <!-- email used for contact and login mapping -->
             <div>
               <label style="font-size:0.8rem;">Email</label>
               <input
@@ -99,6 +114,7 @@
               />
             </div>
 
+            <!-- dob + role in one row -->
             <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Date of birth</label>
@@ -110,6 +126,7 @@
                 />
               </div>
               <div>
+                <!-- role switch between participant and admin -->
                 <label style="font-size:0.8rem;">Role</label>
                 <select
                   name="role"
@@ -121,6 +138,7 @@
               </div>
             </div>
 
+            <!-- phone + city row -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Phone</label>
@@ -142,6 +160,7 @@
               </div>
             </div>
 
+            <!-- state, zip, and school/employer in one row -->
             <div style="display:grid; grid-template-columns:0.6fr 0.8fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">State</label>
@@ -172,6 +191,7 @@
               </div>
             </div>
 
+            <!-- field of interest is its own line -->
             <div>
               <label style="font-size:0.8rem;">Field of interest</label>
               <input
@@ -182,6 +202,7 @@
               />
             </div>
 
+            <!-- photo upload area -->
             <div style="border-top:1px solid rgba(235,216,255,0.9); padding-top:0.7rem; margin-top:0.5rem;">
               <label style="font-size:0.8rem; display:block; margin-bottom:0.3rem;">Profile photo</label>
               <input
@@ -191,6 +212,7 @@
                 style="width:100%; padding:0.3rem 0; font-size:0.85rem;"
               />
               <% if (participant.participantphoto) { %>
+                <!-- optional checkbox to remove existing photo from storage -->
                 <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.3rem; margin-top:0.3rem;">
                   <input type="checkbox" name="removePhoto" />
                   Remove current photo
@@ -198,6 +220,7 @@
               <% } %>
             </div>
 
+            <!-- submit and cancel buttons -->
             <div style="margin-top:0.7rem; display:flex; gap:0.7rem;">
               <button type="submit" class="btn btn-primary">Save changes</button>
               <a href="/participants" class="btn btn-ghost">Cancel</a>
@@ -207,6 +230,7 @@
       </div>
     </section>
 
+    <!-- shared footer -->
     <%- include('partials/footer') %>
   </div>
 </body>

@@ -1,45 +1,59 @@
 <footer class="footer">
   <div class="container footer-inner">
-    <!-- Left: tiny grey-ish teapot + year -->
+
+    <!-- left side: small teapot button + current year -->
     <div class="footer-copy" style="display:flex; align-items:center; gap:0.25rem;">
+
+      <!-- button that links to the /teapot page -->
       <button
         type="button"
         onclick="window.location.href='/teapot';"
-        aria-label="Teapot error"
+        aria-label="teapot error page"
         style="
-          border:none;
-          background:none;
-          cursor:pointer;
-          padding:0;
-          font-size:0.6rem;        /* smaller */
-          line-height:1;
-          filter: grayscale(1);    /* make it grey-ish */
-          opacity:0.55;            /* faded like a © */
+          border:none;               /* remove default button border */
+          background:none;           /* no background so it looks simple */
+          cursor:pointer;            /* show pointer so it's clear it's clickable */
+          padding:0;                 /* keep the emoji tight to the layout */
+          font-size:0.6rem;          /* small emoji size */
+          line-height:1;             /* avoids spacing issues */
+          filter: grayscale(1);      /* makes it grey */
+          opacity:0.55;              /* slightly faded look */
           vertical-align:middle;
         "
       >
         🫖
       </button>
 
+      <!-- prints current year automatically -->
       <span style="color:#666; font-size:0.8rem;">
         <%= new Date().getFullYear() %> Ella Rises
       </span>
     </div>
 
-    <!-- Middle: footer links -->
+    <!-- middle: links in the footer -->
     <div class="footer-links">
+
+      <!-- main home link -->
       <a href="/">Home</a>
+
+      <!-- only show admin link if user is an admin -->
       <% if (user && user.role === 'admin') { %>
         <a href="/admin/dashboard">Admin</a>
       <% } %>
+
     </div>
 
-    <!-- Right: logo + email -->
+    <!-- right side: logo and email link -->
     <div class="footer-social">
+
+      <!-- link to official ella rises website -->
       <a href="https://www.ellarises.org/" target="_blank" rel="noopener" class="footer-logo-link">
         <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" class="footer-logo-img">
       </a>
+
+      <!-- email icon that opens mail app -->
       <a href="mailto:info@ellarises.org">✉</a>
     </div>
+
   </div>
 </footer>
