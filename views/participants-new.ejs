@@ -2,22 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Dynamic title: switches text depending on whether this is self-signup or admin add -->
-  <title>Ella Rises – <%= isSelfSignup ? 'Create your account' : 'Add Participant' %></title>
+  <title>Ella Rises – <%= isSelfSignup ? 'Create your account' : 'Add participant' %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Shared fonts + main stylesheet used across the portal -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
-    <!-- Reusable site header (logo, nav, login state, etc.) -->
     <%- include('partials/header') %>
 
     <section class="section">
       <div class="container" style="max-width:640px;">
-        <!-- Page heading + description, text changes slightly for self-signup vs admin add -->
         <div class="section-header" style="text-align:left;">
           <p class="section-kicker"><%= isSelfSignup ? 'Account' : 'Participants' %></p>
           <h2 class="section-title">
@@ -31,19 +26,12 @@
         </div>
 
         <div class="card">
-          <!-- Error block rendered when the server sends an error message -->
           <% if (error) { %>
             <div class="alert-error">
               <%= error %>
             </div>
           <% } %>
 
-          <!--
-            Single form used both for public signup and admin-created participants.
-            - action: /signup for self-signup, /participants/new for admin add
-            - enctype multipart/form-data so profile photo uploads work
-            - autocomplete toggled so the browser behaves a bit nicer in admin mode
-          -->
           <form
             method="POST"
             action="<%= isSelfSignup ? '/signup' : '/participants/new' %>"
@@ -51,7 +39,7 @@
             autocomplete="<%= isSelfSignup ? 'on' : 'off' %>"
             style="display:flex; flex-direction:column; gap:0.7rem;"
           >
-            <!-- Name fields side by side -->
+            <!-- First / last name -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">First name</label>
@@ -59,8 +47,6 @@
                   name="firstName"
                   type="text"
                   required
-                  <!-- For admin mode we explicitly turn off autocomplete to avoid odd autofill -->
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
@@ -70,66 +56,65 @@
                   name="lastName"
                   type="text"
                   required
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
             </div>
 
-            <!-- Email address for login and communication -->
+            <!-- Email -->
             <div>
               <label style="font-size:0.8rem;">Email</label>
               <input
                 name="email"
                 type="email"
                 required
-                <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                 style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
               />
             </div>
 
-            <!-- PASSWORD FIELD -->
-            <!--
-              Password behaves differently depending on context:
-              - self-signup: required, user creates their own password.
-              - admin add: optional; admins can leave blank if the participant will log in another way later.
-            -->
+            <!-- Password -->
             <div>
-              <label style="font-size:0.8rem;">Password <%= isSelfSignup ? '' : '(optional)' %></label>
-              <input
-                name="password"
-                type="password"
-                <%= isSelfSignup ? 'required' : '' %>
-                <!-- prevent browser from trying to reuse existing passwords in admin flow -->
-                <%= isSelfSignup ? '' : 'autocomplete="new-password"' %>
-                placeholder="<%= isSelfSignup ? 'Create a password for login' : 'Leave blank to keep no password' %>"
-                style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
-              />
+              <label style="font-size:0.8rem;">
+                Password <%= isSelfSignup ? '' : '(optional)' %>
+              </label>
+
               <% if (isSelfSignup) { %>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Create a password for login"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
                 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
                   Your password will be used to log into your Ella Rises portal.
                 </p>
               <% } else { %>
+                <input
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Leave blank to keep no password"
+                  style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
+                />
                 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
                   Admin note: Leave blank if the participant should log in by email only.
                 </p>
               <% } %>
             </div>
-            <!-- END PASSWORD FIELD -->
 
-            <!-- DOB + role row (role only visible when an admin is creating the record) -->
+            <!-- DOB + role (role only for admins) -->
             <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Date of birth</label>
                 <input
                   name="dob"
                   type="date"
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
+
               <% if (!isSelfSignup) { %>
-                <!-- Admins can assign participant vs admin role at creation time -->
                 <div>
                   <label style="font-size:0.8rem;">Role</label>
                   <select
@@ -143,14 +128,13 @@
               <% } %>
             </div>
 
-            <!-- Contact + city row -->
+            <!-- Phone + city -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">Phone</label>
                 <input
                   name="phone"
                   type="text"
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
@@ -159,20 +143,18 @@
                 <input
                   name="city"
                   type="text"
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
             </div>
 
-            <!-- Location + school row (state / zip / school or employer) -->
+            <!-- State / Zip / School -->
             <div style="display:grid; grid-template-columns:0.6fr 0.8fr 1fr; gap:0.6rem;">
               <div>
                 <label style="font-size:0.8rem;">State</label>
                 <input
                   name="state"
                   type="text"
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
@@ -181,7 +163,6 @@
                 <input
                   name="zip"
                   type="text"
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
@@ -190,24 +171,22 @@
                 <input
                   name="school"
                   type="text"
-                  <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                   style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
                 />
               </div>
             </div>
 
-            <!-- Field of interest / focus area -->
+            <!-- Field of interest -->
             <div>
               <label style="font-size:0.8rem;">Field of interest</label>
               <input
                 name="fieldOfInterest"
                 type="text"
-                <%= isSelfSignup ? '' : 'autocomplete="off"' %>
                 style="width:100%; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border-soft); font-size:0.9rem;"
               />
             </div>
 
-            <!-- Optional profile photo upload (used for avatars across the portal) -->
+            <!-- Profile photo -->
             <div>
               <label style="font-size:0.8rem;">Profile photo (optional)</label>
               <input
@@ -221,11 +200,12 @@
               </p>
             </div>
 
-            <!-- Actions row: primary submit button and optional cancel link for admins -->
+            <!-- Buttons -->
             <div style="margin-top:0.7rem; display:flex; gap:0.7rem;">
               <button type="submit" class="btn btn-primary">
                 <%= isSelfSignup ? 'Create my account' : 'Save participant' %>
               </button>
+
               <% if (!isSelfSignup) { %>
                 <a href="/participants" class="btn btn-ghost">Cancel</a>
               <% } %>
@@ -235,7 +215,6 @@
       </div>
     </section>
 
-    <!-- Shared footer for the site -->
     <%- include('partials/footer') %>
   </div>
 </body>
