@@ -100,7 +100,7 @@
             </thead>
             <tbody>
               <!-- empty state when no donations -->
-              <% if (donations.length === 0) { %>
+              <% if (!donations || donations.length === 0) { %>
                 <tr>
                   <td colspan="4" style="padding:0.8rem; color:var(--text-muted);">
                     No donations found.
@@ -109,49 +109,52 @@
               <% } %>
 
               <!-- render each donation row -->
-              <% donations.forEach(d => { 
-                   // build donor name based on available fields
-                   const nameParts = [];
-                   if (d.participantfirstname) nameParts.push(d.participantfirstname);
-                   if (d.participantlastname) nameParts.push(d.participantlastname);
-                   const donorLabel = nameParts.length > 0 ? nameParts.join(' ') : 'Unknown';
+              <% if (donations && donations.length > 0) { %>
+                <% donations.forEach(d => { 
+                     // build donor name based on available fields
+                     const nameParts = [];
+                     if (d.participantfirstname) nameParts.push(d.participantfirstname);
+                     if (d.participantlastname) nameParts.push(d.participantlastname);
+                     const donorLabel = nameParts.length > 0 ? nameParts.join(' ') : 'Unknown';
 
-                   // clean donation amount
-                   const amt = d.donationamount ? Number(d.donationamount) : 0;
-              %>
-                <tr
-                  data-donor="<%= donorLabel.toLowerCase() %>"   <!-- used for searching -->
-                  data-amount="<%= amt %>"                      <!-- used for sorting -->
-                  style="border-top:1px solid rgba(245,235,255,0.9);"
-                >
-                  <td style="padding:0.5rem;"><%= donorLabel %></td>
+                     // clean donation amount
+                     const amt = d.donationamount ? Number(d.donationamount) : 0;
+                %>
+                  <!-- row data attributes used for searching and sorting -->
+                  <tr
+                    data-donor="<%= donorLabel.toLowerCase() %>"
+                    data-amount="<%= amt %>"
+                    style="border-top:1px solid rgba(245,235,255,0.9);"
+                  >
+                    <td style="padding:0.5rem;"><%= donorLabel %></td>
 
-                  <!-- participant ID or placeholder -->
-                  <td style="padding:0.5rem;"><%= d.participantid || '—' %></td>
+                    <!-- participant ID or placeholder -->
+                    <td style="padding:0.5rem;"><%= d.participantid || '—' %></td>
 
-                  <!-- donation amount formatted -->
-                  <td style="padding:0.5rem;">
-                    $<%= d.donationamount
-                          ? Number(d.donationamount).toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })
-                          : '0.00'
-                    %>
-                  </td>
+                    <!-- donation amount formatted -->
+                    <td style="padding:0.5rem;">
+                      $<%= d.donationamount
+                            ? Number(d.donationamount).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })
+                            : '0.00'
+                      %>
+                    </td>
 
-                  <!-- link to participant profile (if applicable) -->
-                  <td style="padding:0.5rem;">
-                    <% if (d.participantid) { %>
-                      <a href="/participants/<%= d.participantid %>" class="btn btn-ghost btn-sm">
-                        View
-                      </a>
-                    <% } else { %>
-                      —
-                    <% } %>
-                  </td>
-                </tr>
-              <% }) %>
+                    <!-- link to participant profile (if applicable) -->
+                    <td style="padding:0.5rem;">
+                      <% if (d.participantid) { %>
+                        <a href="/participants/<%= d.participantid %>" class="btn btn-ghost btn-sm">
+                          View
+                        </a>
+                      <% } else { %>
+                        —
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
             </tbody>
           </table>
         </div>
