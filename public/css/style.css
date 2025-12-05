@@ -863,3 +863,37 @@ img {
   color: var(--primary-dark);
   background: #fff;
 }
+
+@media (max-width: 600px) {
+  .container, .section, .card {
+    padding: 0.8rem !important;
+    margin: 0 !important;
+  }
+
+  h1, h2, h3 { 
+    font-size: 1.18rem !important; 
+  }
+
+  .grid-3, .grid-2, .home-events-layout {
+    display: block !important;
+  }
+
+  .hero-inner, .feature-gallery {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 0.7rem !important;
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .btn, .btn-primary, .btn-ghost {
+    width: 100%;
+    min-width: 0;
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+    margin: 0.3rem 0;
+  }
+}
