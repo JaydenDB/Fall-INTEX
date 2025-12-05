@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- basic page setup -->
   <meta charset="UTF-8" />
   <title>Ella Rises – Event Detail</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- fonts + main stylesheet -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+    <!-- shared header navigation -->
     <%- include('partials/header') %>
 
     <section class="section">
       <div class="container" style="max-width: 1000px;">
+
         <% 
+          // helper: format a date object as a simple date string
           function formatDate(d) {
             if (!d) return 'Date unknown';
-            try { return d.toDateString(); }
-            catch { return String(d); }
+            try { 
+              return d.toDateString(); 
+            } catch { 
+              return String(d); 
+            }
           }
 
+          // helper: format date + time in a more detailed way
           function formatDateTime(d) {
             if (!d) return 'Date unknown';
             try {
@@ -33,7 +43,7 @@
           }
         %>
 
-        <!-- HEADER -->
+        <!-- header for this event template -->
         <div class="section-header" style="text-align:left;">
           <p class="section-kicker">Event</p>
           <h2 class="section-title"><%= eventTemplate.eventname %></h2>
@@ -42,7 +52,7 @@
           </p>
         </div>
 
-        <!-- SUMMARY ROW -->
+        <!-- summary row: event details + kpi cards -->
         <div style="
           display:grid; 
           grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); 
@@ -50,16 +60,19 @@
           align-items:flex-start; 
           margin-bottom:1.4rem;
         ">
-          <!-- META INFO -->
+
+          <!-- left side: meta info about the event template -->
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.3rem;">Event template</p>
             <h3 style="margin:0 0 0.3rem;"><%= eventTemplate.eventname %></h3>
 
+            <!-- event type, if stored -->
             <p style="font-size:0.86rem; color:var(--text-muted); margin:0.2rem 0;">
               Type:
               <strong><%= eventTemplate.eventtype || 'Not specified' %></strong>
             </p>
 
+            <!-- recurrence pattern, if any -->
             <% if (eventTemplate.eventrecurrencepattern) { %>
               <p style="font-size:0.86rem; color:var(--text-muted); margin:0.2rem 0;">
                 Recurrence:
@@ -67,6 +80,7 @@
               </p>
             <% } %>
 
+            <!-- default capacity, if set on the template -->
             <% if (eventTemplate.eventdefaultcapacity) { %>
               <p style="font-size:0.86rem; color:var(--text-muted); margin:0.2rem 0;">
                 Default capacity:
@@ -74,12 +88,14 @@
               </p>
             <% } %>
 
+            <!-- description text, if available -->
             <% if (eventTemplate.eventdescription) { %>
               <p style="font-size:0.86rem; color:var(--text-muted); margin-top:0.4rem;">
                 <%= eventTemplate.eventdescription %>
               </p>
             <% } %>
 
+            <!-- admin-only actions: edit / delete -->
             <% if (user && user.role === 'admin') { %>
               <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
                 <a href="/events/<%= eventTemplate.eventtemplateid %>/edit" class="btn btn-primary btn-sm">
@@ -97,16 +113,21 @@
                 </form>
               </div>
             <% } %>
-
           </div>
 
-          <!-- KPI CARDS -->
+          <!-- right side: simple kpi cards for this event template -->
           <div style="display:grid; grid-template-columns:1fr; gap:0.9rem;">
+
+            <!-- registrations and attendance card -->
             <div class="card">
               <p class="section-kicker" style="margin-bottom:0.2rem;">Registrations & attendance</p>
+
+              <!-- total registrations -->
               <div style="font-size:1.4rem; font-weight:700;">
                 <%= stats.registrations.totalRegistrations || 0 %> registrations
               </div>
+
+              <!-- attended count + percentage -->
               <p style="font-size:0.8rem; color:var(--text-muted); margin:0.2rem 0;">
                 Attended:
                 <strong><%= stats.registrations.totalAttended || 0 %></strong><br>
@@ -115,14 +136,21 @@
               </p>
             </div>
 
+            <!-- survey outcomes card -->
             <div class="card">
               <p class="section-kicker" style="margin-bottom:0.2rem;">Survey outcomes</p>
+
+              <!-- average overall score -->
               <div style="font-size:1.4rem; font-weight:700;">
                 <%= stats.surveys.avgOverall %> / 5 overall
               </div>
+
+              <!-- number of surveys -->
               <p style="font-size:0.8rem; color:var(--text-muted); margin:0.2rem 0;">
                 From <strong><%= stats.surveys.totalSurveys || 0 %></strong> survey(s)
               </p>
+
+              <!-- average satisfaction score -->
               <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">
                 Satisfaction: <strong><%= stats.surveys.avgSatisfaction %></strong> / 5
               </p>
@@ -130,7 +158,7 @@
           </div>
         </div>
 
-        <!-- OCCURRENCES TABLE -->
+        <!-- occurrences table: individual scheduled sessions for this template -->
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:0.5rem;">
             <div>
@@ -141,6 +169,7 @@
             </div>
           </div>
 
+          <!-- if there are no occurrences, show a simple message instead of a table -->
           <% if (!stats.occurrences || stats.occurrences.length === 0) { %>
             <p style="font-size:0.85rem; color:var(--text-muted); margin:0.5rem 0 0;">
               No occurrences have been scheduled yet.
@@ -158,9 +187,12 @@
               <tbody>
                 <% stats.occurrences.forEach(o => { %>
                   <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                    <!-- formatted date using helper -->
                     <td style="padding:0.45rem;">
                       <%= formatDate(o.eventdatetimestart) %>
                     </td>
+
+                    <!-- time of occurrence, if available -->
                     <td style="padding:0.45rem;">
                       <% if (o.eventdatetimestart) { %>
                         <%= o.eventdatetimestart.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' }) %>
@@ -168,9 +200,13 @@
                         —
                       <% } %>
                     </td>
+
+                    <!-- location or TBD if not set -->
                     <td style="padding:0.45rem;">
                       <%= o.eventlocation || 'TBD' %>
                     </td>
+
+                    <!-- capacity: per occurrence, or fallback to template default -->
                     <td style="padding:0.45rem;">
                       <%= o.eventcapacity != null 
                           ? o.eventcapacity 
@@ -187,6 +223,7 @@
       </div>
     </section>
 
+    <!-- shared footer -->
     <%- include('partials/footer') %>
   </div>
 </body>

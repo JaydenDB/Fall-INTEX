@@ -1,3 +1,4 @@
+// Load environment variables from .env into process.env
 require("dotenv").config();
 
 const express = require("express");
@@ -8,52 +9,69 @@ const multer = require("multer");
 const knexLib = require("knex");
 const bcrypt = require("bcrypt");
 
+// How many salt rounds to use when hashing passwords with bcrypt
 const SALT_ROUNDS = 10;
 const app = express();
 
 /* --------------------------------------------------
    VIEW ENGINE
+   - Use EJS templates located in /views
 -------------------------------------------------- */
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 /* --------------------------------------------------
    STATIC FILES + UPLOADS
+   - Serve /public as static
+   - Handle uploads into /images/uploads
 -------------------------------------------------- */
 const uploadRoot = path.join(__dirname, "images");
 const uploadDir = path.join(uploadRoot, "uploads");
 
-// Make sure upload directory exists
+// Ensure base image directory exists
 if (!fs.existsSync(uploadRoot)) fs.mkdirSync(uploadRoot);
+// Ensure uploads subdirectory exists
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
+// Configure how multer stores uploaded files
 const storage = multer.diskStorage({
+  // Save all uploaded files into uploadDir
   destination: (req, file, cb) => cb(null, uploadDir),
+  // Name files with a timestamp + original filename (reduces conflicts)
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 
+// Multer instance using the above disk storage
 const upload = multer({ storage });
 
+// Serve any file under /images from the images folder
 app.use("/images", express.static(uploadRoot));
+
+// Serve rotating hero/carousel images from a specific public folder
 app.use(
   "/images/rotate-images",
   express.static(path.join(__dirname, "public", "images", "rotate-images"))
 );
+
+// Serve anything under /public (CSS, JS, etc.)
 app.use(express.static("public"));
 
 /* --------------------------------------------------
    SESSION
+   - Simple in-memory session (sufficient for class project)
 -------------------------------------------------- */
 app.use(
   session({
+    // Secret used to sign the session ID cookie
     secret: process.env.SESSION_SECRET || "fallback-secret-key",
-    resave: false,
-    saveUninitialized: false,
+    resave: false,          // Don't re-save unchanged sessions
+    saveUninitialized: false, // Don't create sessions until we store data
   })
 );
 
 /* --------------------------------------------------
    CONSTANTS (DONOR LEVELS)
+   - Read from env or fallback defaults
 -------------------------------------------------- */
 const DONOR_LEVEL_PLATINUM = process.env.DONOR_LEVEL_PLATINUM
   ? Number(process.env.DONOR_LEVEL_PLATINUM)
@@ -67,11 +85,13 @@ const DONOR_LEVEL_SILVER = process.env.DONOR_LEVEL_SILVER
 
 /* --------------------------------------------------
    BODY PARSING
+   - Parse URL-encoded form submissions into req.body
 -------------------------------------------------- */
 app.use(express.urlencoded({ extended: true }));
 
 /* --------------------------------------------------
    DATABASE (Postgres intex)
+   - Connection to RDS Postgres, schema "ellarises"
 -------------------------------------------------- */
 const knex = knexLib({
   client: "pg",
@@ -81,12 +101,12 @@ const knex = knexLib({
     password: "intexpassword",
     database: "intexdb",
     port: 5432,
-    ssl: { rejectUnauthorized: false },
+    ssl: { rejectUnauthorized: false }, // accept RDS cert without CA chain
   },
-  searchPath: ["ellarises"],
+  searchPath: ["ellarises"], // default schema
 });
 
-// quick connection test
+// Quick connection sanity check on startup
 knex
   .raw("SELECT 1")
   .then(() => console.log("✅ Connected to PostgreSQL (intex)"))
@@ -95,12 +115,15 @@ knex
 /* --------------------------------------------------
    AUTH HELPERS
 -------------------------------------------------- */
+
+// Middleware: attach logged-in user (if any) to res.locals so EJS can use it
 function attachUser(req, res, next) {
   res.locals.user = req.session.user || null;
   next();
 }
 app.use(attachUser);
 
+// Middleware: require *any* logged-in user
 function requireAuth(req, res, next) {
   if (!req.session.user) {
     return res.redirect("/login");
@@ -108,6 +131,7 @@ function requireAuth(req, res, next) {
   next();
 }
 
+// Middleware: require admin role for protected admin routes
 function requireAdmin(req, res, next) {
   if (!req.session.user || req.session.user.role !== "admin") {
     return res.status(403).send("Access denied. Admins only.");
@@ -115,6 +139,7 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// Helper: percentage display as a string like "67%"; returns "—" if total is 0
 function pct(part, whole) {
   if (!whole || whole === 0) return "—";
   return Math.round((part / whole) * 100) + "%";
@@ -122,6 +147,8 @@ function pct(part, whole) {
 
 /* --------------------------------------------------
    ID HELPERS (WORKAROUND BROKEN SEQUENCES)
+   - Manually generate next ID by max + 1
+   - This avoids issues if DB sequences are not aligned
 -------------------------------------------------- */
 
 async function getNextParticipantId() {
@@ -140,21 +167,34 @@ async function getNextEventTemplateId() {
 
 /* --------------------------------------------------
    STATS HELPERS
+   - Compute rollup stats for participants & events
 -------------------------------------------------- */
 
+/**
+ * Build a stats object for a single participant:
+ * - donations totals & recent donations
+ * - survey averages & recent surveys
+ * - milestones (education / career)
+ * - registrations & attendance rate
+ *
+ * Participant may be matched by ID or by email, to tolerate older data.
+ */
 async function buildParticipantStats(participantId, participantEmail) {
   const emailLower = participantEmail ? participantEmail.toLowerCase() : null;
 
+  // Helper for donations: match either by participantid OR by (lowercased) email
   const donationsWhere = (qb) => {
     if (participantId) qb.where("participantid", participantId);
     if (emailLower) qb.orWhereRaw("LOWER(participantemail) = ?", [emailLower]);
   };
 
+  // Helper for surveys: only email is available on the surveys table
   const emailWhere = (qb) => {
     if (emailLower) qb.whereRaw("LOWER(participantemail) = ?", [emailLower]);
-    else qb.whereRaw("1 = 0");
+    else qb.whereRaw("1 = 0"); // no email -> intentionally match nothing
   };
 
+  // Run several queries in parallel for performance
   const [
     donationAgg,
     recentDonations,
@@ -164,6 +204,7 @@ async function buildParticipantStats(participantId, participantEmail) {
     regTotalRow,
     regAttendedRow,
   ] = await Promise.all([
+    // Donation aggregates: sum, count, first/last dates
     knex("donations")
       .modify(donationsWhere)
       .sum("donationamount as totalamount")
@@ -172,12 +213,14 @@ async function buildParticipantStats(participantId, participantEmail) {
       .max("donationdate as lastdonation")
       .first(),
 
+    // Recent individual donations
     knex("donations")
       .modify(donationsWhere)
       .orderBy("donationdate", "desc")
       .limit(5)
       .select("donationdate", "donationamount"),
 
+    // Survey aggregates
     knex("surveys")
       .modify(emailWhere)
       .count("surveyid as totalsurveys")
@@ -187,6 +230,7 @@ async function buildParticipantStats(participantId, participantEmail) {
       .avg("surveyoverallscore as avgoverall")
       .first(),
 
+    // Recent surveys (for dashboard list)
     knex("surveys")
       .modify(emailWhere)
       .orderBy("surveysubmissiondate", "desc")
@@ -199,6 +243,7 @@ async function buildParticipantStats(participantId, participantEmail) {
         "surveyoverallscore"
       ),
 
+    // Milestones, matched by participantid OR email
     knex("milestones")
       .modify((qb) => {
         if (participantId) qb.where("participantid", participantId);
@@ -207,6 +252,7 @@ async function buildParticipantStats(participantId, participantEmail) {
       .orderBy("milestonedate", "desc")
       .limit(10),
 
+    // Total registrations (to compute attendance rate)
     knex("registrations")
       .modify((qb) => {
         if (participantId) qb.where("participantid", participantId);
@@ -216,6 +262,7 @@ async function buildParticipantStats(participantId, participantEmail) {
       .count("registrationid as totalregistrations")
       .first(),
 
+    // Registrations that were actually attended
     knex("registrations")
       .modify((qb) => {
         if (participantId) qb.where("participantid", participantId);
@@ -230,6 +277,7 @@ async function buildParticipantStats(participantId, participantEmail) {
   const totalRegistrations = Number(regTotalRow?.totalregistrations || 0);
   const totalAttended = Number(regAttendedRow?.totalattended || 0);
 
+  // Normalize return structure to be safe for EJS templates
   return {
     donations: {
       totalAmount: Number(donationAgg?.totalamount || 0),
@@ -255,11 +303,18 @@ async function buildParticipantStats(participantId, participantEmail) {
   };
 }
 
+/**
+ * Build stats for a given event template:
+ * - gather all occurrences
+ * - compute overall registrations / attendance / survey scores
+ */
 async function buildEventStats(eventTemplateId) {
+  // All occurrences for the template
   const occurrences = await knex("eventoccurrences")
     .where("eventtemplateid", eventTemplateId)
     .orderBy("eventdatetimestart", "desc");
 
+  // Extract IDs for use in whereIn()
   const occIds = occurrences.map((o) => o.eventoccurrenceid);
 
   let totalRegistrations = 0;
@@ -269,6 +324,7 @@ async function buildEventStats(eventTemplateId) {
   let avgOverall = 0;
 
   if (occIds.length > 0) {
+    // Only run these queries if there are occurrences
     const [regTotalRow, regAttendedRow, surveyAggRow] = await Promise.all([
       knex("registrations")
         .whereIn("eventoccurrenceid", occIds)
@@ -295,6 +351,7 @@ async function buildEventStats(eventTemplateId) {
     avgOverall = Number(surveyAggRow?.avgoverall || 0);
   }
 
+  // Normalize for template
   return {
     occurrences,
     registrations: {
@@ -314,13 +371,18 @@ async function buildEventStats(eventTemplateId) {
    ROUTES
 -------------------------------------------------- */
 
-/* ----- API: carousel images ----- */
+/* ----- API: carousel images -----
+   - Returns list of image URLs under /public/images/rotate-images
+   - Used by front-end carousel JS
+-------------------------------------------------- */
 app.get("/api/carousel-images", (req, res) => {
   const carouselDir = path.join(__dirname, "public", "images", "rotate-images");
 
   try {
     const files = fs.readdirSync(carouselDir);
     const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+
+    // Only include files with image extensions
     const images = files
       .filter((file) =>
         imageExtensions.includes(path.extname(file).toLowerCase())
@@ -330,15 +392,20 @@ app.get("/api/carousel-images", (req, res) => {
     res.json({ images });
   } catch (err) {
     console.error("Error reading carousel images:", err);
+    // Fail gracefully with an empty array so the front-end doesn't crash
     res.json({ images: [] });
   }
 });
 
-/* ----- HOME / LANDING PAGE ----- */
+/* ----- HOME / LANDING PAGE -----
+   - Pulls high-level stats, upcoming events, and top donors
+   - Renders index.ejs
+-------------------------------------------------- */
 app.get("/", async (req, res) => {
   const user = req.session.user || null;
 
   try {
+    // Run many aggregate queries in parallel for performance
     const [
       participantsCountRow,
       eventsCountRow,
@@ -349,10 +416,15 @@ app.get("/", async (req, res) => {
       upcomingEventsRows,
       donorsAgg,
     ] = await Promise.all([
+      // Total participants
       knex("participants").count("participantid as count").first(),
+      // Total event occurrences
       knex("eventoccurrences").count("eventoccurrenceid as count").first(),
+      // Total milestones recorded
       knex("milestones").count("milestoneid as count").first(),
+      // How many participants have at least one milestone
       knex("milestones").countDistinct("participantid as count").first(),
+      // Participants with "STEAM-ish" degree milestones
       knex("milestones")
         .where(function () {
           this.whereRaw(
@@ -372,6 +444,7 @@ app.get("/", async (req, res) => {
         })
         .countDistinct("participantid as count")
         .first(),
+      // Participants with "STEAM-ish" job / internship milestones
       knex("milestones")
         .where(function () {
           this.whereRaw(
@@ -390,6 +463,7 @@ app.get("/", async (req, res) => {
         })
         .countDistinct("participantid as count")
         .first(),
+      // Next 3 upcoming event occurrences
       knex("eventoccurrences as eo")
         .leftJoin(
           "eventtemplates as et",
@@ -407,7 +481,7 @@ app.get("/", async (req, res) => {
           "et.eventtype",
           "et.eventdescription"
         ),
-      // Donors with names if available
+      // Top 5 donors by total amount; show name if known
       knex("donations as d")
         .leftJoin("participants as p", "d.participantid", "p.participantid")
         .select(
@@ -438,6 +512,7 @@ app.get("/", async (req, res) => {
     const steamDegreeParticipants = Number(steamDegreeRow?.count || 0);
     const steamJobParticipants = Number(steamJobRow?.count || 0);
 
+    // High-level impact stats for the landing page
     const milestonesSummary = [
       {
         label: "Education",
@@ -462,9 +537,12 @@ app.get("/", async (req, res) => {
       },
     ];
 
+    // Transform upcoming events to a simpler shape for the template
     const upcomingEvents = upcomingEventsRows.map((ev) => {
       let dateDisplay = "TBD";
       const dt = ev.eventdatetimestart;
+
+      // Safely attempt to format the date
       if (dt instanceof Date && !isNaN(dt)) {
         const month = dt.toLocaleString("en-US", { month: "short" });
         const day = dt.getDate();
@@ -480,9 +558,11 @@ app.get("/", async (req, res) => {
       };
     });
 
+    // Map donor aggregates to nice display objects
     const donors = donorsAgg.map((d) => {
       const total = Number(d.totalamount || 0);
       let level = "Supporter";
+
       if (total >= DONOR_LEVEL_PLATINUM) level = "Platinum";
       else if (total >= DONOR_LEVEL_GOLD) level = "Gold";
       else if (total >= DONOR_LEVEL_SILVER) level = "Silver";
@@ -490,7 +570,7 @@ app.get("/", async (req, res) => {
       const displayName =
         (d.participantfirstname || d.participantlastname)
           ? `${d.participantfirstname || ""} ${d.participantlastname || ""}`.trim()
-          : d.email;
+          : d.email; // Fallback to email if no name on file
 
       return {
         displayName,
@@ -505,6 +585,7 @@ app.get("/", async (req, res) => {
       milestonesAchieved,
     };
 
+    // Render home page with all assembled data
     res.render("index", {
       activePage: "home",
       user,
@@ -515,6 +596,7 @@ app.get("/", async (req, res) => {
     });
   } catch (err) {
     console.error("Error loading home page:", err);
+    // If anything fails, show page with safe defaults instead of crashing
     res.render("index", {
       activePage: "home",
       user,
@@ -526,11 +608,15 @@ app.get("/", async (req, res) => {
   }
 });
 
-/* ----- PARTICIPANT PERSONAL DASHBOARD (/me) ----- */
+/* ----- PARTICIPANT PERSONAL DASHBOARD (/me)
+   - Private page for the logged-in participant
+   - Uses buildParticipantStats to show their donations/surveys/etc.
+-------------------------------------------------- */
 app.get("/me", requireAuth, async (req, res) => {
   const user = req.session.user;
 
   try {
+    // Look up participant row for this session's user
     const participant = await knex("participants")
       .where("participantid", user.id)
       .first();
@@ -539,6 +625,7 @@ app.get("/me", requireAuth, async (req, res) => {
       return res.status(404).send("Participant not found.");
     }
 
+    // Build stats object for this participant
     const stats = await buildParticipantStats(
       participant.participantid,
       participant.participantemail
@@ -561,6 +648,8 @@ app.get("/me", requireAuth, async (req, res) => {
 -------------------------------------------------- */
 
 // GET /login
+// - If already logged in, redirect to home
+// - Otherwise show login form
 app.get("/login", (req, res) => {
   if (req.session.user) {
     return res.redirect("/");
@@ -573,7 +662,9 @@ app.get("/login", (req, res) => {
   });
 });
 
-// POST /login (email + password)
+// POST /login
+// - Email + password form
+// - Supports legacy accounts (email-only) AND hashed passwords
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -581,11 +672,13 @@ app.post("/login", async (req, res) => {
   const suppliedPassword = (password || "").trim();
 
   try {
+    // Find participant by email (case-insensitive)
     const participant = await knex("participants")
       .whereRaw("LOWER(participantemail) = LOWER(?)", [suppliedEmail])
       .first();
 
     if (!participant) {
+      // Do not reveal whether email exists; generic error
       return res.render("login", {
         activePage: "login",
         error: "Invalid email or password.",
@@ -593,7 +686,7 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    // Prefer "password" column, but fall back to participantpassword if it ever exists
+    // Prefer the new `password` column; fall back to old `participantpassword` if present
     const dbPasswordRaw =
       participant.password ?? participant.participantpassword ?? "";
 
@@ -602,6 +695,7 @@ app.post("/login", async (req, res) => {
     // If a password is stored, require it to match.
     // If NO password stored (legacy accounts), allow login by email only.
     if (dbPassword) {
+      // If password is required but not supplied, fail
       if (!suppliedPassword) {
         return res.render("login", {
           activePage: "login",
@@ -612,15 +706,17 @@ app.post("/login", async (req, res) => {
 
       let passwordMatches = false;
 
-      // If it looks like a bcrypt hash
+      // If it looks like a bcrypt hash (starts with "$2")
       if (dbPassword.startsWith("$2")) {
+        // Compare hashed password
         passwordMatches = await bcrypt.compare(suppliedPassword, dbPassword);
       } else {
-        // Legacy plaintext password
+        // Legacy plain-text password (not ideal, but kept for backwards compatibility)
         passwordMatches = suppliedPassword === dbPassword;
       }
 
       if (!passwordMatches) {
+        // Generic error to avoid leaking password correctness
         return res.render("login", {
           activePage: "login",
           error: "Invalid email or password.",
@@ -631,6 +727,7 @@ app.post("/login", async (req, res) => {
 
     const role = (participant.participantrole || "participant").toLowerCase();
 
+    // Store minimal user info in session
     req.session.user = {
       id: participant.participantid,
       email: participant.participantemail,
@@ -641,6 +738,7 @@ app.post("/login", async (req, res) => {
       role,
     };
 
+    // Redirect based on role
     if (role === "admin") {
       return res.redirect("/admin/dashboard");
     } else {
@@ -657,6 +755,7 @@ app.post("/login", async (req, res) => {
 });
 
 // GET /logout
+// - Destroy session and redirect back to login
 app.get("/logout", (req, res) => {
   req.session.destroy(() => {
     res.redirect("/login");
@@ -665,7 +764,10 @@ app.get("/logout", (req, res) => {
 
 /* --------------------------------------------------
    SELF SIGNUP
+   - Public self-registration for participants
 -------------------------------------------------- */
+
+// Show the self-signup form (reuses participants-new view)
 app.get("/signup", (req, res) => {
   res.render("participants-new", {
     activePage: "signup",
@@ -675,6 +777,7 @@ app.get("/signup", (req, res) => {
   });
 });
 
+// Handle self-signup form submission
 app.post("/signup", upload.single("photo"), async (req, res) => {
   const {
     email,
@@ -692,6 +795,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
 
   const photoPath = req.file ? `/images/uploads/${req.file.filename}` : null;
 
+  // Basic password validation (required, non-empty)
   if (!password || password.trim() === "") {
     return res.render("participants-new", {
       activePage: "signup",
@@ -701,6 +805,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
     });
   }
 
+  // Minimum password length for basic security
   if ((password || "").trim().length < 8) {
     return res.render("participants-new", {
       activePage: "signup",
@@ -710,6 +815,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
     });
   }
 
+  // Check for existing account with same email
   try {
     const existing = await knex("participants")
       .whereRaw("LOWER(participantemail) = LOWER(?)", [email || ""])
@@ -733,10 +839,12 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
     });
   }
 
+  // Actually create the new participant
   try {
     const newId = await getNextParticipantId();
     const hashedPassword = await bcrypt.hash(password.trim(), SALT_ROUNDS);
 
+    // Insert and return the new row (Postgres .returning("*"))
     const [newParticipant] = await knex("participants")
       .insert({
         participantid: newId,
@@ -752,12 +860,13 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
         participantschooloremployer: school || null,
         participantfieldofinterest: fieldOfInterest || null,
         participantphoto: photoPath,
-        password: hashedPassword,
+        password: hashedPassword, // Save bcrypt hash, not plaintext
       })
       .returning("*");
 
     const role = (newParticipant.participantrole || "participant").toLowerCase();
 
+    // Log them in immediately after signup
     req.session.user = {
       id: newParticipant.participantid,
       email: newParticipant.participantemail,
@@ -781,7 +890,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
 });
 
 /* --------------------------------------------------
-   ADMIN DASHBOARD
+   ADMIN DASHBOARD (high-level KPIs)
 -------------------------------------------------- */
 app.get("/admin/dashboard", requireAdmin, async (req, res) => {
   const user = req.session.user;
@@ -795,13 +904,16 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
       eventScoresRows,
       donationAgg,
     ] = await Promise.all([
+      // Overall survey info
       knex("surveys")
         .count("surveyid as count")
         .avg({ avgsatisfaction: "surveysatisfactionscore" })
         .avg({ avgusefulness: "surveyusefulnessscore" })
         .avg({ avgrecommend: "surveyrecommendationscore" })
         .first(),
+      // Total participants
       knex("participants").count("participantid as count").first(),
+      // Participants with STEAM-like degree milestones
       knex("milestones")
         .where(function () {
           this.whereRaw(
@@ -821,6 +933,7 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
         })
         .countDistinct("participantid as count")
         .first(),
+      // Participants with STEAM-like jobs / internships
       knex("milestones")
         .where(function () {
           this.whereRaw(
@@ -839,6 +952,7 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
         })
         .countDistinct("participantid as count")
         .first(),
+      // Top 5 events by overall score
       knex("surveys")
         .select("eventname")
         .count("* as responsecount")
@@ -847,6 +961,7 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
         .groupBy("eventname")
         .orderBy("avgoverall", "desc")
         .limit(5),
+      // Donation totals and number of distinct donors
       knex("donations")
         .sum({ totalamount: "donationamount" })
         .countDistinct({ donorcount: "participantemail" })
@@ -857,6 +972,7 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
     const steamDegreeParticipants = Number(steamDegreeRow?.count || 0);
     const steamJobParticipants = Number(steamJobRow?.count || 0);
 
+    // KPI block for admin dashboard
     const kpis = {
       avgSatisfaction: Number(surveyAgg?.avgsatisfaction || 0).toFixed(2),
       avgUsefulness: Number(surveyAgg?.avgusefulness || 0).toFixed(2),
@@ -868,6 +984,7 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
       donorCount: Number(donationAgg?.donorcount || 0),
     };
 
+    // Per-event summary for "top events" card
     const topEvents = eventScoresRows.map((ev) => ({
       name: ev.eventname,
       responseCount: Number(ev.responsecount || 0),
@@ -896,7 +1013,8 @@ app.get("/admin/dashboard", requireAdmin, async (req, res) => {
    PARTICIPANTS (LIST + CRUD + DETAIL)
 -------------------------------------------------- */
 
-// LIST (admin-only)
+// LIST (admin-only) - /participants
+// - Supports search (name/email) and role filter (admin/participant)
 app.get("/participants", requireAdmin, async (req, res) => {
   const { search, role } = req.query;
 
@@ -915,6 +1033,7 @@ app.get("/participants", requireAdmin, async (req, res) => {
       )
       .orderBy("participantlastname", "asc");
 
+    // Case-insensitive search across first name, last name, or email
     if (search && search.trim() !== "") {
       const s = `%${search.toLowerCase()}%`;
       query = query.whereRaw(
@@ -923,6 +1042,7 @@ app.get("/participants", requireAdmin, async (req, res) => {
       );
     }
 
+    // Role filter (all / participant / admin)
     if (role && role !== "all") {
       query = query.where("participantrole", role);
     }
@@ -944,7 +1064,7 @@ app.get("/participants", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: add participant (FORM)
+// ADMIN: add participant (FORM) - manual admin creation
 app.get("/participants/new", requireAdmin, (req, res) => {
   res.render("participants-new", {
     activePage: "participants",
@@ -992,16 +1112,16 @@ app.post(
         });
       }
 
-      // 2) Generate next id
+      // 2) Generate next custom ID
       const newId = await getNextParticipantId();
 
-      // 3) Hash password if provided
+      // 3) Hash password if provided (admins can create accounts with or without passwords)
       let hashedPassword = null;
       if (password && password.trim() !== "") {
         hashedPassword = await bcrypt.hash(password.trim(), SALT_ROUNDS);
       }
 
-      // 4) Insert
+      // 4) Insert participant row
       await knex("participants").insert({
         participantid: newId,
         participantemail: email,
@@ -1032,7 +1152,7 @@ app.post(
   }
 );
 
-// ADMIN: participant detail
+// ADMIN: participant detail page with stats
 app.get("/participants/:id", requireAdmin, async (req, res) => {
   const id = req.params.id;
 
@@ -1045,6 +1165,7 @@ app.get("/participants/:id", requireAdmin, async (req, res) => {
       return res.status(404).send("Participant not found");
     }
 
+    // Build stats for this participant (donations, surveys, etc.)
     const stats = await buildParticipantStats(
       participant.participantid,
       participant.participantemail
@@ -1062,7 +1183,7 @@ app.get("/participants/:id", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: edit participant
+// ADMIN: edit participant (FORM)
 app.get("/participants/:id/edit", requireAdmin, async (req, res) => {
   const id = req.params.id;
 
@@ -1087,6 +1208,7 @@ app.get("/participants/:id/edit", requireAdmin, async (req, res) => {
   }
 });
 
+// ADMIN: edit participant (SUBMIT)
 app.post(
   "/participants/:id/edit",
   requireAdmin,
@@ -1120,6 +1242,7 @@ app.post(
         return res.status(404).send("Participant not found");
       }
 
+      // Start with existing photo; then override based on upload / remove flag
       let photoPath = existing.participantphoto;
       if (file) {
         photoPath = `/images/uploads/${file.filename}`;
@@ -1127,6 +1250,7 @@ app.post(
         photoPath = null;
       }
 
+      // Base update payload (no password yet)
       const updateData = {
         participantemail: email,
         participantfirstname: firstName,
@@ -1142,6 +1266,7 @@ app.post(
         participantphoto: photoPath,
       };
 
+      // If admin entered a new password, hash and update it
       if (password && password.trim() !== "") {
         updateData.password = await bcrypt.hash(password.trim(), SALT_ROUNDS);
       }
@@ -1156,7 +1281,7 @@ app.post(
   }
 );
 
-// ADMIN: delete participant
+// ADMIN: delete participant (no cascade here; foreign keys may enforce behavior)
 app.post("/participants/:id/delete", requireAdmin, async (req, res) => {
   const id = req.params.id;
 
@@ -1173,7 +1298,8 @@ app.post("/participants/:id/delete", requireAdmin, async (req, res) => {
    EVENTS (LIST + CREATE + DETAIL + EDIT + DELETE)
 -------------------------------------------------- */
 
-// PUBLIC events list (no login required)
+// PUBLIC events list (no auth)
+// - Lists event templates (not specific occurrences)
 app.get("/events", async (req, res) => {
   try {
     const eventTemplates = await knex("eventtemplates")
@@ -1226,6 +1352,7 @@ app.post("/events/new", requireAdmin, async (req, res) => {
 
   const trimmedName = (eventName || "").trim();
 
+  // Require an event name
   if (!trimmedName) {
     return res.render("events-new", {
       activePage: "events",
@@ -1274,7 +1401,7 @@ app.post("/events/new", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: event detail
+// ADMIN: event detail with stats across all occurrences
 app.get("/events/:id", requireAdmin, async (req, res) => {
   const id = req.params.id;
 
@@ -1287,6 +1414,7 @@ app.get("/events/:id", requireAdmin, async (req, res) => {
       return res.status(404).send("Event template not found");
     }
 
+    // Build aggregated stats for this event template
     const stats = await buildEventStats(id);
 
     res.render("event-detail", {
@@ -1301,7 +1429,7 @@ app.get("/events/:id", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: edit event (form)
+// ADMIN: edit event template (form)
 app.get("/events/:id/edit", requireAdmin, async (req, res) => {
   const id = req.params.id;
 
@@ -1326,7 +1454,7 @@ app.get("/events/:id/edit", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: edit event (submit)
+// ADMIN: edit event template (submit)
 app.post("/events/:id/edit", requireAdmin, async (req, res) => {
   const id = req.params.id;
   const {
@@ -1358,7 +1486,7 @@ app.post("/events/:id/edit", requireAdmin, async (req, res) => {
   }
 });
 
-// ADMIN: delete event
+// ADMIN: delete event template
 app.post("/events/:id/delete", requireAdmin, async (req, res) => {
   const id = req.params.id;
 
@@ -1375,10 +1503,12 @@ app.post("/events/:id/delete", requireAdmin, async (req, res) => {
    DONATIONS
 -------------------------------------------------- */
 
+// Shortcut: redirect /donations/new -> /donate
 app.get("/donations/new", (req, res) => {
   res.redirect("/donate");
 });
 
+// Show donation form (public)
 app.get("/donate", (req, res) => {
   res.render("donations-new", {
     activePage: "donate",
@@ -1388,9 +1518,11 @@ app.get("/donate", (req, res) => {
   });
 });
 
+// Handle donation submission
 app.post("/donate", async (req, res) => {
   const { email, amount } = req.body;
 
+  // Validate amount is numeric
   if (!amount || isNaN(parseFloat(amount))) {
     return res.render("donations-new", {
       activePage: "donate",
@@ -1402,6 +1534,8 @@ app.post("/donate", async (req, res) => {
 
   try {
     let participantId = null;
+
+    // If a logged-in participant donates, capture their participantid
     if (req.session.user && req.session.user.id) {
       participantId = req.session.user.id;
     }
@@ -1430,9 +1564,11 @@ app.post("/donate", async (req, res) => {
   }
 });
 
+// ADMIN: view donation list + summary
 app.get("/admin/donations", requireAdmin, async (req, res) => {
   try {
     const [donations, donationSummary] = await Promise.all([
+      // List of recent donations with optional participant name
       knex("donations as d")
         .leftJoin("participants as p", "d.participantid", "p.participantid")
         .select(
@@ -1446,6 +1582,7 @@ app.get("/admin/donations", requireAdmin, async (req, res) => {
         )
         .orderBy("d.donationdate", "desc")
         .limit(200),
+      // Aggregate donation stats
       knex("donations")
         .sum({ totalamount: "donationamount" })
         .count("* as donationcount")
@@ -1471,6 +1608,7 @@ app.get("/admin/donations", requireAdmin, async (req, res) => {
    ADMIN DASHBOARDS (TABLEAU EMBED)
 -------------------------------------------------- */
 app.get("/admin/dashboards", requireAdmin, (req, res) => {
+  // Simple view that contains Tableau embed iframes
   res.render("admin-dashboards", {
     activePage: "admin-dashboards",
     user: req.session.user,
@@ -1480,10 +1618,13 @@ app.get("/admin/dashboards", requireAdmin, (req, res) => {
 /* --------------------------------------------------
    FUN / MISC
 -------------------------------------------------- */
+
+// A fun little Easter-egg route
 app.get("/teapot", (req, res) => {
   res.status(418).send("I'm a little teapot, short and stout. ☕");
 });
 
+// Public-facing impact metrics link simply redirects to home for now
 app.get("/dashboard/public", (req, res) => {
   res.redirect("/");
 });
@@ -1492,6 +1633,8 @@ app.get("/dashboard/public", (req, res) => {
    START SERVER
 -------------------------------------------------- */
 const port = process.env.PORT || 3001;
+
+// Start Express server
 app.listen(port, () => {
   console.log("The server is listening on port", port);
 });

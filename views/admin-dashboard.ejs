@@ -1,93 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- set character encoding so text renders correctly -->
   <meta charset="UTF-8" />
+
+  <!-- title shown in the browser tab -->
   <title>Ella Rises – Admin Dashboards</title>
+
+  <!-- make layout responsive on phones and tablets -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- load google fonts used in the site (quicksand for body, playfair for headings) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- main stylesheet for shared styles across the site -->
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+    <!-- include the shared header (navigation, logo, auth buttons) -->
     <%- include('partials/header') %>
 
+    <!-- main content area for the admin dashboards page -->
     <section class="section">
       <div class="container">
+
+        <!-- top section: page logo, label, and short description -->
         <div class="section-header">
-          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;">
+          <!-- centered logo for visual branding -->
+          <img
+            src="/images/ella%20rises%20logo.png"
+            alt="Ella Rises Logo"
+            style="width: 80px; height: 80px; margin: 0 auto 1rem; display: block;"
+          >
+          <!-- small label showing this is an admin page -->
           <p class="section-kicker">Admin</p>
+          <!-- main title for the page -->
           <h2 class="section-title">Impact Dashboards</h2>
+          <!-- short description explaining what kind of data is on this page -->
           <p class="section-subtitle">
             Live KPIs from surveys, milestones, and donations. Use this page to tell the
             story of which experiences are leading to long-term STEAM outcomes.
           </p>
         </div>
 
-        <!-- KPI ROW -->
+        <!-- KPI ROW: three summary cards side by side -->
         <div class="grid-3" style="margin-bottom:1.5rem;">
+
+          <!-- card 1: survey experience metrics -->
           <div class="card">
+            <!-- label at the top of the card -->
             <p class="section-kicker" style="margin-bottom:0.3rem;">Survey experience</p>
+
+            <!-- only show metrics if kpis data was passed from the server -->
             <% if (kpis) { %>
+
+              <!-- main satisfaction score, shown large -->
               <div style="font-size:2rem; font-weight:700;">
+                <!-- EJS prints avgSatisfaction directly from the kpis object -->
                 <%= kpis.avgSatisfaction %> / 5
               </div>
+
+              <!-- explanation line with total number of survey responses -->
               <p style="font-size:0.9rem; color:var(--text-muted); margin:0.3rem 0;">
                 Average satisfaction across <strong><%= kpis.totalSurveys %></strong> survey responses.
               </p>
+
+              <!-- two smaller sub-metrics: usefulness and recommend scores -->
               <div style="display:flex; gap:1rem; margin-top:0.6rem; font-size:0.85rem;">
+
+                <!-- usefulness column -->
                 <div>
                   <div style="font-weight:600;"><%= kpis.avgUsefulness %> / 5</div>
                   <div style="color:var(--text-muted);">Usefulness</div>
                 </div>
+
+                <!-- would recommend column -->
                 <div>
                   <div style="font-weight:600;"><%= kpis.avgRecommend %> / 5</div>
                   <div style="color:var(--text-muted);">Would recommend</div>
                 </div>
               </div>
+
             <% } else { %>
+              <!-- fallback text when there is no survey data yet -->
               <p style="font-size:0.9rem; color:var(--text-muted);">
                 No survey data yet. Once surveys are loaded, this card will show averages.
               </p>
             <% } %>
           </div>
 
+          <!-- card 2: STEAM outcomes (education and career milestones) -->
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.3rem;">STEAM outcomes</p>
+
+            <!-- again, only show data if kpis object exists -->
             <% if (kpis) { %>
+              <!-- vertical stack of two outcome metrics -->
               <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.9rem;">
+
+                <!-- STEAM degree milestones (BS/MS etc.) -->
                 <div>
+                  <!-- percentage or rate for degree completion -->
                   <div style="font-size:1.4rem; font-weight:700;"><%= kpis.steamGradRate %></div>
                   <div style="color:var(--text-muted);">
                     Participants with STEAM degree milestones (BS/MS in engineering, data, art & design, etc.).
                   </div>
                 </div>
+
+                <!-- STEAM internships or job milestones -->
                 <div>
+                  <!-- percentage or rate for job/internship outcomes -->
                   <div style="font-size:1.4rem; font-weight:700;"><%= kpis.steamJobRate %></div>
                   <div style="color:var(--text-muted);">
                     Participants with STEAM internships or job-like milestones.
                   </div>
                 </div>
               </div>
+
             <% } else { %>
+              <!-- fallback text when milestone data is not yet available -->
               <p style="font-size:0.9rem; color:var(--text-muted);">
                 Milestones will populate these percentages automatically once loaded.
               </p>
             <% } %>
           </div>
 
+          <!-- card 3: donor impact (donations) -->
           <div class="card">
             <p class="section-kicker" style="margin-bottom:0.3rem;">Donor impact</p>
+
+            <!-- only show donation stats if kpis is available -->
             <% if (kpis) { %>
+              <!-- total donation amount, formatted as currency -->
               <div style="font-size:1.6rem; font-weight:700;">
+                <!-- convert totalDonations to a Number and format with 2 decimal places -->
                 $<%= Number(kpis.totalDonations).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
               </div>
+
+              <!-- count of unique donor email addresses -->
               <p style="font-size:0.9rem; color:var(--text-muted); margin:0.3rem 0;">
                 Total recorded donations from <strong><%= kpis.donorCount %></strong> unique donor emails.
               </p>
+
+              <!-- short hint about how this card can be used in conversations with funders -->
               <p style="font-size:0.8rem; color:var(--text-muted);">
                 Use this card when talking with potential funders to show scale of support to date.
               </p>
             <% } else { %>
+              <!-- fallback text when there are no donation records yet -->
               <p style="font-size:0.9rem; color:var(--text-muted);">
                 No donations recorded yet. Once donations are made, this card will update in real time.
               </p>
@@ -95,8 +159,10 @@
           </div>
         </div>
 
-        <!-- TOP EVENTS TABLE -->
+        <!-- TOP EVENTS TABLE: ranking events based on survey scores -->
         <div class="card" style="margin-bottom:1.5rem;">
+
+          <!-- header area for the table: title and explanation -->
           <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:0.6rem;">
             <div>
               <h3 style="margin:0 0 0.25rem;">Top events by overall score</h3>
@@ -106,8 +172,10 @@
             </div>
           </div>
 
+          <!-- table structure for listing events and their metrics -->
           <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
             <thead>
+              <!-- header row with column names -->
               <tr style="text-align:left; border-bottom:1px solid rgba(235,216,255,0.9);">
                 <th style="padding:0.45rem;">Event name</th>
                 <th style="padding:0.45rem;">Responses</th>
@@ -117,17 +185,24 @@
             </thead>
             <tbody>
               <% if (!topEvents || topEvents.length === 0) { %>
+                <!-- if no events are available, show one row with a message -->
                 <tr>
+                  <!-- colspan=4 so the message spans the whole table width -->
                   <td colspan="4" style="padding:0.8rem; color:var(--text-muted);">
                     No survey data yet. Once surveys are recorded, this table will rank events automatically.
                   </td>
                 </tr>
               <% } else { %>
+                <!-- otherwise, loop through topEvents array and render each event -->
                 <% topEvents.forEach(ev => { %>
                   <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+                    <!-- event name, shown bold -->
                     <td style="padding:0.45rem;"><strong><%= ev.name %></strong></td>
+                    <!-- number of survey responses for that event -->
                     <td style="padding:0.45rem;"><%= ev.responseCount %></td>
+                    <!-- average overall rating (e.g., 4.6 / 5) -->
                     <td style="padding:0.45rem;"><%= ev.avgOverall %> / 5</td>
+                    <!-- average satisfaction rating -->
                     <td style="padding:0.45rem;"><%= ev.avgSatisfaction %> / 5</td>
                   </tr>
                 <% }) %>
@@ -136,32 +211,53 @@
           </table>
         </div>
 
-        <!-- TABLEAU IMPACT DASHBOARD EMBED -->
+        <!-- TABLEAU IMPACT DASHBOARD EMBED: interactive visual dashboard -->
         <div class="card" style="margin-bottom:1.5rem;">
+          <!-- title for the embedded dashboard -->
           <h3 style="margin-bottom:0.5rem;">Ella Rises Impact Dashboard (Tableau)</h3>
+
+          <!-- short explanation of what this dashboard shows -->
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">
             Explore live survey, milestone, and donation data in this Tableau dashboard.
           </p>
 
+          <!-- container for tableau embed, uses id to hook the script below -->
           <div class="tableauPlaceholder" id="viz1764789115052" style="position: relative">
+
+            <!-- noscript block: fallback image if javascript is disabled -->
             <noscript>
               <a href="#">
-                <img alt="Ella Rises Impact Dashboard"
-                     src="https://public.tableau.com/static/images/K4/K4PQQQQ4X/1_rss.png"
-                     style="border: none" />
+                <img
+                  alt="Ella Rises Impact Dashboard"
+                  src="https://public.tableau.com/static/images/K4/K4PQQQQ4X/1_rss.png"
+                  style="border: none"
+                />
               </a>
             </noscript>
+
+            <!-- tableau object that the script will use to render the live viz -->
             <object class="tableauViz" style="display:none;">
+              <!-- base host for tableau public -->
               <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+              <!-- version of the embed code -->
               <param name="embed_code_version" value="3" />
+              <!-- path to the specific shared workbook/dashboard -->
               <param name="path" value="shared&#47;K4PQQQQ4X" />
+              <!-- show or hide the tableau toolbar -->
               <param name="toolbar" value="yes" />
+              <!-- url of static image used before viz loads or if needed -->
               <param name="static_image" value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;K4&#47;K4PQQQQ4X&#47;1.png" />
+              <!-- whether to animate transitions inside the viz -->
               <param name="animate_transition" value="yes" />
+              <!-- whether to display the static image before the interactive viz is ready -->
               <param name="display_static_image" value="yes" />
+              <!-- show a spinner while loading -->
               <param name="display_spinner" value="yes" />
+              <!-- show dark overlay on top of viz while loading -->
               <param name="display_overlay" value="yes" />
+              <!-- show view count in the bottom-right corner -->
               <param name="display_count" value="yes" />
+              <!-- language for the viz ui -->
               <param name="language" value="en-US" />
             </object>
           </div>
@@ -169,26 +265,42 @@
       </div>
     </section>
 
+    <!-- include the shared footer (teapot, links, logo, email) -->
     <%- include('partials/footer') %>
   </div>
 
-  <!-- Tableau embed script -->
+  <!-- tableau embed script: sets size and loads tableau js api -->
   <script type="text/javascript">
+    // get the placeholder div that wraps the tableau object
     var divElement = document.getElementById('viz1764789115052');
+
+    // only run embed logic if the element actually exists on the page
     if (divElement) {
+      // inside the placeholder, grab the first <object> element (the tableauViz)
       var vizElement = divElement.getElementsByTagName('object')[0];
+
+      // adjust width and height based on container width
+      // this makes the viz responsive at different breakpoints
       if (divElement.offsetWidth > 800) {
+        // desktop / large screens: full width, height = 75% of width
         vizElement.style.width = '100%';
         vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px';
       } else if (divElement.offsetWidth > 500) {
+        // medium screens (tablets, small laptops): same ratio
         vizElement.style.width = '100%';
         vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px';
       } else {
+        // small screens (phones): fixed height so viz is readable
         vizElement.style.width = '100%';
         vizElement.style.height = '1127px';
       }
+
+      // dynamically create a <script> tag for the tableau public js api
       var scriptElement = document.createElement('script');
       scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+
+      // insert the script tag right before the viz object
+      // tableau will use this to render the interactive dashboard into the object
       vizElement.parentNode.insertBefore(scriptElement, vizElement);
     }
   </script>

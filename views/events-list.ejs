@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- basic page setup -->
   <meta charset="UTF-8" />
   <title>Ella Rises – Events</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- fonts + main stylesheet -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="page">
+    <!-- shared site header -->
     <%- include('partials/header') %>
 
     <section class="section">
       <div class="container">
+
+        <!-- page header section -->
         <div class="section-header" style="text-align:left;">
-          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo" style="width: 70px; height: 70px; margin-bottom: 1rem;">
+          <img src="/images/ella%20rises%20logo.png" alt="Ella Rises Logo"
+               style="width: 70px; height: 70px; margin-bottom: 1rem;">
           <p class="section-kicker">Events</p>
           <h2 class="section-title">Event Templates</h2>
           <p class="section-subtitle" style="margin-left:0;">
-            These are the reusable templates that Ella Rises uses to schedule recurring events and track outcomes.
+            These are the reusable templates Ella Rises uses for recurring events and tracking outcomes.
           </p>
         </div>
 
+        <!-- admin-only button to add new templates -->
         <% if (user && user.role === 'admin') { %>
           <div style="margin-bottom:0.9rem; text-align:right;">
             <a href="/events/new" class="btn btn-primary btn-sm">
@@ -30,6 +38,7 @@
           </div>
         <% } %>
 
+        <!-- main table of templates -->
         <div class="card">
           <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
             <thead>
@@ -44,15 +53,23 @@
               </tr>
             </thead>
             <tbody>
+
+              <!-- empty-state message -->
               <% if (!eventTemplates || eventTemplates.length === 0) { %>
                 <tr>
-                  <td colspan="<%= (user && user.role === 'admin') ? 5 : 4 %>" style="padding:0.8rem; color:var(--text-muted);">
+                  <td colspan="<%= (user && user.role === 'admin') ? 5 : 4 %>"
+                      style="padding:0.8rem; color:var(--text-muted);">
                     No events found.
                   </td>
                 </tr>
+
               <% } else { %>
+
+                <!-- render each event template row -->
                 <% eventTemplates.forEach(ev => { %>
                   <tr style="border-top:1px solid rgba(245,235,255,0.9);">
+
+                    <!-- event name + optional short description -->
                     <td style="padding:0.5rem;">
                       <strong><%= ev.eventname %></strong>
                       <% if (ev.eventdescription) { %>
@@ -61,24 +78,23 @@
                         </div>
                       <% } %>
                     </td>
+
+                    <!-- type, capacity, recurrence -->
                     <td style="padding:0.5rem;"><%= ev.eventtype || '—' %></td>
                     <td style="padding:0.5rem;"><%= ev.eventdefaultcapacity || '—' %></td>
                     <td style="padding:0.5rem;"><%= ev.eventrecurrencepattern || '—' %></td>
 
+                    <!-- admin actions: view / edit / delete -->
                     <% if (user && user.role === 'admin') { %>
                       <td style="padding:0.5rem; text-align:right; white-space:nowrap;">
-                        <a
-                          href="/events/<%= ev.eventtemplateid %>"
-                          class="btn btn-ghost btn-sm"
-                          style="margin-right:0.25rem;"
-                        >
+                        <a href="/events/<%= ev.eventtemplateid %>"
+                           class="btn btn-ghost btn-sm"
+                           style="margin-right:0.25rem;">
                           View
                         </a>
-                        <a
-                          href="/events/<%= ev.eventtemplateid %>/edit"
-                          class="btn btn-ghost btn-sm"
-                          style="margin-right:0.25rem;"
-                        >
+                        <a href="/events/<%= ev.eventtemplateid %>/edit"
+                           class="btn btn-ghost btn-sm"
+                           style="margin-right:0.25rem;">
                           Edit
                         </a>
                         <form
@@ -87,25 +103,27 @@
                           style="display:inline;"
                           onsubmit="return confirm('Delete this event template? This may affect linked data.');"
                         >
-                          <button
-                            type="submit"
-                            class="btn btn-ghost btn-sm"
-                            style="color:#b3261e;"
-                          >
+                          <button type="submit"
+                                  class="btn btn-ghost btn-sm"
+                                  style="color:#b3261e;">
                             Delete
                           </button>
                         </form>
                       </td>
                     <% } %>
+
                   </tr>
                 <% }) %>
+
               <% } %>
+
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
+    <!-- shared site footer -->
     <%- include('partials/footer') %>
   </div>
 </body>
