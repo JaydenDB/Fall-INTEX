@@ -6,7 +6,9 @@ const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 const knexLib = require("knex");
+const bcrypt = require("bcrypt");
 
+const SALT_ROUNDS = 10;
 const app = express();
 
 /* --------------------------------------------------
@@ -600,7 +602,25 @@ app.post("/login", async (req, res) => {
     // If a password is stored, require it to match.
     // If NO password stored (legacy accounts), allow login by email only.
     if (dbPassword) {
-      if (!suppliedPassword || suppliedPassword !== dbPassword) {
+      if (!suppliedPassword) {
+        return res.render("login", {
+          activePage: "login",
+          error: "Invalid email or password.",
+          formEmail: suppliedEmail,
+        });
+      }
+
+      let passwordMatches = false;
+
+      // If it looks like a bcrypt hash
+      if (dbPassword.startsWith("$2")) {
+        passwordMatches = await bcrypt.compare(suppliedPassword, dbPassword);
+      } else {
+        // Legacy plaintext password
+        passwordMatches = suppliedPassword === dbPassword;
+      }
+
+      if (!passwordMatches) {
         return res.render("login", {
           activePage: "login",
           error: "Invalid email or password.",
@@ -715,6 +735,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
 
   try {
     const newId = await getNextParticipantId();
+    const hashedPassword = await bcrypt.hash(password.trim(), SALT_ROUNDS);
 
     const [newParticipant] = await knex("participants")
       .insert({
@@ -731,7 +752,7 @@ app.post("/signup", upload.single("photo"), async (req, res) => {
         participantschooloremployer: school || null,
         participantfieldofinterest: fieldOfInterest || null,
         participantphoto: photoPath,
-        password: password.trim(),
+        password: hashedPassword,
       })
       .returning("*");
 
@@ -933,7 +954,7 @@ app.get("/participants/new", requireAdmin, (req, res) => {
   });
 });
 
-// ADMIN: add participant (SUBMIT)  ✅ updated
+// ADMIN: add participant (SUBMIT)
 app.post(
   "/participants/new",
   requireAdmin,
@@ -974,7 +995,13 @@ app.post(
       // 2) Generate next id
       const newId = await getNextParticipantId();
 
-      // 3) Insert
+      // 3) Hash password if provided
+      let hashedPassword = null;
+      if (password && password.trim() !== "") {
+        hashedPassword = await bcrypt.hash(password.trim(), SALT_ROUNDS);
+      }
+
+      // 4) Insert
       await knex("participants").insert({
         participantid: newId,
         participantemail: email,
@@ -989,7 +1016,7 @@ app.post(
         participantschooloremployer: school || null,
         participantfieldofinterest: fieldOfInterest || null,
         participantphoto: photoPath,
-        password: password ? password.trim() : null,
+        password: hashedPassword,
       });
 
       res.redirect("/participants");
@@ -1116,7 +1143,7 @@ app.post(
       };
 
       if (password && password.trim() !== "") {
-        updateData.password = password.trim();
+        updateData.password = await bcrypt.hash(password.trim(), SALT_ROUNDS);
       }
 
       await knex("participants").where("participantid", id).update(updateData);
